@@ -9,7 +9,7 @@ class HazardValueTypeAdmin(admin.ModelAdmin):
 
 @admin.register(HazardClassType)
 class HazardValueTypeAdmin(admin.ModelAdmin):
-    list_display = ('name', )
+    list_display = ('name', 'class1_item', 'class2_item', 'class3_item', 'class4_item')
 
 class ValuePropInline(admin.TabularInline):
     model = HazardValueProp

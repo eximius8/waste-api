@@ -42,9 +42,9 @@ class WasteComponent(models.Model):
         """
         x = set()
         for prop in self.class_props.all():
-            x.add(prop.importance)
+            x.add(prop.value_type.importance)
         for prop in self.value_props.all():
-            x.add(prop.importance)        
+            x.add(prop.value_type.importance)        
         if len(x) < 6:
             Binf = 1
         elif 6 <= len(x) <= 8:
@@ -102,12 +102,12 @@ class WasteComponent(models.Model):
         BigX = 0        
         x = set()
         for value_prop in self.value_props.all():
-            if not value_prop.importance in x:                
-                x.add(value_prop.importance)
+            if not value_prop.value_type.importance in x:                
+                x.add(value_prop.value_type.importance)
                 BigX += value_prop.get_score()
         for class_prop in self.class_props.all():
-            if not class_prop.importance in x:                
-                x.add(class_prop.importance)
+            if not class_prop.value_type.importance in x:                
+                x.add(class_prop.value_type.importance)
                 BigX += class_prop.get_score()
 
         if len(x) < 6:
@@ -130,9 +130,27 @@ class WasteComponent(models.Model):
         verbose_name_plural = "Компоненты отхода"
 
 
-class HazardValueType(models.Model):
 
+class AbstractHazardPropType(models.Model):
+    
+    importance = models.PositiveSmallIntegerField(blank=False, verbose_name='Важность', unique=True)
     name = models.CharField(max_length=400, blank=False, verbose_name="Название")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        abstract = True
+
+class HazardClassType(AbstractHazardPropType):    
+
+    class1_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 1")
+    class2_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 2")
+    class3_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 3")
+    class4_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 4")
+
+
+class HazardValueType(AbstractHazardPropType):    
 
     bad_val = models.FloatField(blank=False, verbose_name="Значение выше или меньше которого класс опасности = 1")
     average_val = models.FloatField(blank=False, verbose_name="Среднее значение")
@@ -165,24 +183,14 @@ class HazardValueType(models.Model):
         
         if self.bad_val < self.good_val and (self.average_val < self.bad_val or self.average_val > self.good_val):
             raise ValidationError(f'Среднее значение должно быть между {self.bad_val} и {self.good_val}')
-
-    def __str__(self):
-        return self.name
+   
 
     class Meta:
         verbose_name = "Числовой параметр"
         verbose_name_plural = "Числовые параметры"
    
 
-class AbstractHazardProp(models.Model):
-    
-    importance = models.PositiveSmallIntegerField(blank=False,                                                 
-                                                 verbose_name='Важность')
-
-    class Meta:
-        abstract = True
-
-class HazardValueProp(AbstractHazardProp):
+class HazardValueProp(models.Model):
 
     waste_component = models.ForeignKey(WasteComponent, on_delete=models.CASCADE, related_name='value_props')
     
@@ -205,19 +213,11 @@ class HazardValueProp(AbstractHazardProp):
         verbose_name = "Числовое свойство"
         verbose_name_plural = "Числовые свойства"
 
-class HazardClassType(models.Model):
 
-    name = models.CharField(max_length=400, blank=False, verbose_name="Название")
 
-    class1_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 1")
-    class2_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 2")
-    class3_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 3")
-    class4_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 4")
 
-    def __str__(self):
-        return self.name
 
-class HazardClassProp(AbstractHazardProp):
+class HazardClassProp(models.Model):
 
     waste_component = models.ForeignKey(WasteComponent, on_delete=models.CASCADE, related_name='class_props')
     
