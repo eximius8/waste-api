@@ -1,15 +1,28 @@
 from django.contrib import admin
 
-from chemcomponent.models import WasteComponent, HazardValueProp, LiteratureSource
+from chemcomponent.models import  HazardValueProp, HazardClassProp, HazardValueType, HazardClassType, WasteComponent, LiteratureSource
 
-class ChildInline(admin.TabularInline):
+
+@admin.register(HazardValueType)
+class HazardValueTypeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'bad_val', 'average_val', 'good_val')
+
+@admin.register(HazardClassType)
+class HazardValueTypeAdmin(admin.ModelAdmin):
+    list_display = ('name', )
+
+class ValuePropInline(admin.TabularInline):
     model = HazardValueProp
+
+class ClassPropInline(admin.TabularInline):
+    model = HazardClassProp
 
 @admin.register(WasteComponent)
 class WasteComponentAdmin(admin.ModelAdmin):
     list_display = ('name', 'chemical_type', 'W', 'log_W', 'unique_props', 'Binf')
     inlines = [
-        ChildInline,
+        ValuePropInline,
+        ClassPropInline,
     ]
     
     def W(self, obj):
@@ -29,16 +42,19 @@ class WasteComponentAdmin(admin.ModelAdmin):
 
 @admin.register(HazardValueProp)
 class HazardPropAdmin(admin.ModelAdmin):
-    list_display = ('name', 'value', 'waste_component','literature_source', 'score')
-    list_filter = ('waste_component',)
-
-    def name(self, obj):
-        return obj.get_prop_type_display()
-    
-    def value(self, obj):
-        return obj.get_val()
+    list_display = ('waste_component', 'value_type', 'prop_float_value', 'score', 'literature_source')
 
     def score(self, obj):
         return obj.get_score()
+
+@admin.register(HazardClassProp)
+class HazardPropAdmin(admin.ModelAdmin):
+    list_display = ('waste_component', 'value_type',  'score', 'literature_source')
+
+    def score(self, obj):
+        return obj.get_score()
+    
+
+   
 
 admin.site.register(LiteratureSource)
