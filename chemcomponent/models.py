@@ -13,19 +13,19 @@ class WasteComponent(models.Model):
     """
     class for a component of the waste
     Класс для компонентов отхода
-    """
+    """    
+    name = models.CharField(max_length=400, blank=False, verbose_name="Название")
     CHOICES = (
         ('S', 'Неопасное W=10^6'), 
         ('O', 'Органическое'),
-        ('I', 'Неорганическое'),
-        #('U', 'Неизвестно'),              
+        ('I', 'Неорганическое'),          
     )
 
     chemical_type = models.CharField(max_length=1, 
                                      blank=False, 
                                      default = 'S', 
                                      choices=CHOICES, 
-                                     verbose_name="Вещество")
+                                     verbose_name="Тип")
 
     hazard_value_prop = models.ManyToManyField(LiteratureSource, 
                                          through='HazardValueProp', 
@@ -78,9 +78,29 @@ class WasteComponent(models.Model):
         """
         if self.chemical_type == 'S':
             return 1000000.
-     
 
-class HazardValueProp(models.Model):
+        return 0
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = "Компонент отхода"
+
+
+
+class HazardAbstractProp(models.Model):
+
+    def get_score(self):
+        return self.prop_value
+
+    def get_prop_type(self):
+        return self.prop_type 
+
+    class Meta:
+        abstract = True       
+
+class HazardValueProp(HazardAbstractProp):
 
     waste_component = models.ForeignKey(WasteComponent, on_delete=models.CASCADE)
     literature_source = models.ForeignKey(LiteratureSource, on_delete=models.CASCADE)
@@ -103,11 +123,48 @@ class HazardValueProp(models.Model):
         (23, 'ПДКпп в продуктах питания'),                  
     )
 
+    allowed_ranges = {
+        1: (5., 50.5, 1000., ), 
+        2: (0.01, 0.105, 1., ),
+        3: (0.1, 1.05, 10., ),
+        4: (0.01, 0.105, 1., ),  
+        9: (15., 150.5, 5000., ),
+        10: (500, 5000.5, 50000., ),
+        12: (5., 1.95, 1.),
+        13: (5., 1.95, 1.),
+        14: (0.001, 0.0105, 0.1, ),
+        15: (0.001, 0.0105, 0.1, ),
+        16: (0.001, 0.0105, 0.1, ),
+        17: (0.001, 0.0105, 0.1, ),
+        18: (0.001, 0.0105, 0.1, ),
+        19: (0.001, 0.0105, 0.1, ),
+        23: (0.001, 0.0105, 0.1, )           
+    }
+
     prop_type = models.PositiveSmallIntegerField(blank=False, choices=CHOICES)
     prop_value = models.FloatField(blank=False)
 
     def get_score(self):
-        pass
+        allowed_range = self.allowed_ranges[self.prop_type]
+        if allowed_range[0] < allowed_range[2]:
+            if self.prop_value <= allowed_range[0]:
+                return 1
+            elif allowed_range[0] <= self.prop_value <= allowed_range[1]:
+                return 2
+            elif allowed_range[1] <= self.prop_value <= allowed_range[2]:
+                return 3
+            else:
+                return 4
+        elif allowed_range[0] > allowed_range[2]:
+            if self.prop_value >= allowed_range[0]:
+                return 1
+            elif allowed_range[0] >= self.prop_value >= allowed_range[1]:
+                return 2
+            elif allowed_range[1] >= self.prop_value >= allowed_range[2]:
+                return 3
+            else:
+                return 4
+        
 
 
     def clean(self):
@@ -115,16 +172,9 @@ class HazardValueProp(models.Model):
         if self.prop_value < 0 and self.prop_type != 19:     
             raise ValidationError(f'{self.prop_type} не может быть меньше 0')
        
+ 
 
-class HazardAbstractClassProp(models.Model):
-
-    def get_score(self):
-        return self.prop_value    
-
-    class Meta:
-        abstract = True     
-
-class HazardClassProp(HazardAbstractClassProp):
+class HazardClassProp(HazardAbstractProp):
 
     waste_component = models.ForeignKey(WasteComponent, on_delete=models.CASCADE)
     literature_source = models.ForeignKey(LiteratureSource, on_delete=models.CASCADE)
@@ -148,7 +198,7 @@ class HazardClassProp(HazardAbstractClassProp):
    
 
 
-class CancerogProp(HazardAbstractClassProp):
+class CancerogProp(HazardAbstractProp):
 
     waste_component = models.ForeignKey(WasteComponent, on_delete=models.CASCADE)
     literature_source = models.ForeignKey(LiteratureSource, on_delete=models.CASCADE)
@@ -169,7 +219,7 @@ class CancerogProp(HazardAbstractClassProp):
 
 
 
-class PersistProp(HazardAbstractClassProp):
+class PersistProp(HazardAbstractProp):
 
     waste_component = models.ForeignKey(WasteComponent, on_delete=models.CASCADE)
     literature_source = models.ForeignKey(LiteratureSource, on_delete=models.CASCADE)
@@ -185,7 +235,7 @@ class PersistProp(HazardAbstractClassProp):
     
     prop_value = models.PositiveSmallIntegerField(blank=False, choices=CLASS_CHOICES)
 
-class BioAccProp(HazardAbstractClassProp):
+class BioAccProp(HazardAbstractProp):
 
     waste_component = models.ForeignKey(WasteComponent, on_delete=models.CASCADE)
     literature_source = models.ForeignKey(LiteratureSource, on_delete=models.CASCADE)
@@ -202,7 +252,7 @@ class BioAccProp(HazardAbstractClassProp):
     prop_value = models.PositiveSmallIntegerField(blank=False, choices=CLASS_CHOICES)
 
 
-class MutagenProp(HazardAbstractClassProp):
+class MutagenProp(HazardAbstractProp):
 
     waste_component = models.ForeignKey(WasteComponent, on_delete=models.CASCADE)
     literature_source = models.ForeignKey(LiteratureSource, on_delete=models.CASCADE)
