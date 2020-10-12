@@ -26,7 +26,12 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 INSTALLED_APPS = [
     'home',
     'search',
+    # Компоненты отходов
     'chemcomponent',
+    # свойства компонент отходов
+    'componentprop',
+    # литературные источники
+    'litsource',
 
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',

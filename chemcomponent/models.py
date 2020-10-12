@@ -1,20 +1,7 @@
 from django.db import models
-
 from django.core.exceptions import ValidationError
 
-class LiteratureSource(models.Model):
-
-    name = models.CharField(blank=False, max_length=100, unique=True)
-    latexpart = models.TextField(blank=False)
-
-    def __str__(self):
-        return self.name
-
-    
-    class Meta:
-        verbose_name = "Литературный источник"
-        verbose_name_plural = "Литературные источники"
-
+import math
 
 
 class WasteComponent(models.Model):
@@ -33,28 +20,41 @@ class WasteComponent(models.Model):
                                      blank=False, 
                                      default = 'S', 
                                      choices=CHOICES, 
-                                     verbose_name="Тип")    
+                                     verbose_name="Тип")
+    w_value = models.FloatField(blank=True, 
+                                null=True, 
+                                verbose_name="W - Коэффициента степени опасности компонента (если известен - указание источника обязательно)")
+    lit_source = models.ForeignKey('litsource.LiteratureSource',
+                                    blank=True, 
+                                    null=True, 
+                                    on_delete=models.SET_NULL, 
+                                    related_name='waste_components', 
+                                    verbose_name='Источник литературы (если задано числовое значение W, то обязателен)')
+
+    def clean(self):
+        if self.w_value and not self.lit_source:
+            raise ValidationError(f'При задании коэффициента W, необходимо указать источник литературы, откуда он взят')      
+
+                           
+    
 
     def get_num_unique_props(self):
         """
         get number of hazard_props with unique importances
         should be updated to distinct
-        """
-        x = set()
-        for prop in self.class_props.all():
-            x.add(prop.value_type.importance)
-        for prop in self.value_props.all():
-            x.add(prop.value_type.importance)        
-        if len(x) < 6:
+        """       
+        prop_num = self.category_props.count() + self.value_props.count()
+           
+        if prop_num < 6:
             Binf = 1
-        elif 6 <= len(x) <= 8:
+        elif 6 <= prop_num <= 8:
             Binf = 2
-        elif 8 < len(x) <= 10:
+        elif 8 < prop_num <= 10:
             Binf = 3
         else:
             Binf = 4
 
-        return [len(x), Binf]
+        return [prop_num, Binf]
    
     def get_k(self, conc):
         """
@@ -71,6 +71,9 @@ class WasteComponent(models.Model):
         """
         if self.chemical_type == 'S':
             return 1000000.
+        if self.w_value:
+            return self.w_value
+
 
         return 10.**self.get_log_w()
     
@@ -79,6 +82,12 @@ class WasteComponent(models.Model):
         Функция считает логарифм от коэффициента степени опасности компонента
         уточнить логарифм десятичный или какой-то другой
         """
+        if self.chemical_type == 'S':
+
+            return 6.
+        if self.w_value:
+            return math.log10(self.w_value)
+
         z = self.get_z()
         if 1. <= z <= 2:
             return 4. - 4. / z
@@ -99,27 +108,30 @@ class WasteComponent(models.Model):
         """
         относительный параметр опасности компонента отхода для окружающей среды
         """
-        BigX = 0        
-        x = set()
+        BigX = 0
+        num_props = 0     
+       
         for value_prop in self.value_props.all():
-            if not value_prop.value_type.importance in x:                
-                x.add(value_prop.value_type.importance)
-                BigX += value_prop.get_score()
-        for class_prop in self.class_props.all():
-            if not class_prop.value_type.importance in x:                
-                x.add(class_prop.value_type.importance)
-                BigX += class_prop.get_score()
+            BigX += value_prop.get_score()
+            num_props += 1
+            # if not value_prop.value_type.importance in x:                
+            #     x.add(value_prop.value_type.importance)
+                
+        for category_prop in self.category_props.all():
+            BigX += category_prop.get_score()
+            num_props += 1
+            
 
-        if len(x) < 6:
+        if num_props < 6:
             Binf = 1
-        elif 6 <= len(x) <= 8:
+        elif 6 <= num_props <= 8:
             Binf = 2
-        elif 8 < len(x) <= 10:
+        elif 8 < num_props <= 10:
             Binf = 3
         else:
             Binf = 4
                     
-        return (BigX + Binf) / (len(x) + 1)
+        return (BigX + Binf) / (num_props + 1)
 
 
     def __str__(self):
@@ -131,114 +143,3 @@ class WasteComponent(models.Model):
 
 
 
-class AbstractHazardPropType(models.Model):
-    
-    importance = models.PositiveSmallIntegerField(blank=False, verbose_name='Важность', unique=True)
-    name = models.CharField(max_length=400, blank=False, verbose_name="Название")
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        abstract = True
-
-class HazardClassType(AbstractHazardPropType):    
-
-    class1_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 1")
-    class2_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 2")
-    class3_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 3")
-    class4_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 4")
-
-
-class HazardValueType(AbstractHazardPropType):    
-
-    bad_val = models.FloatField(blank=False, verbose_name="Значение выше или меньше которого класс опасности = 1")
-    average_val = models.FloatField(blank=False, verbose_name="Среднее значение")
-    good_val = models.FloatField(blank=False, verbose_name="Значение выше или меньше которого класс опасности = 4")
-
-    def get_score(self, obj_value):
-        if self.good_val < self.bad_val:
-            if obj_value < self.good_val:
-                return 4
-            elif obj_value > self.bad_val:
-                return 1
-            elif self.good_val <= obj_value <= self.average_val:
-                return 3
-            elif self.average_val < obj_value <= self.bad_val:
-                return 2
-
-        if obj_value > self.good_val:
-            return 4
-        elif obj_value < self.bad_val:
-            return 1
-        elif self.average_val <= obj_value <= self.good_val:
-            return 3
-        elif self.bad_val < obj_value <= self.average_val:
-            return 2
-
-
-    def clean(self):
-        if self.good_val < self.bad_val and (self.average_val < self.good_val or self.average_val > self.bad_val):
-            raise ValidationError(f'Среднее значение должно быть между {self.good_val} и {self.bad_val}')
-        
-        if self.bad_val < self.good_val and (self.average_val < self.bad_val or self.average_val > self.good_val):
-            raise ValidationError(f'Среднее значение должно быть между {self.bad_val} и {self.good_val}')
-   
-
-    class Meta:
-        verbose_name = "Числовой параметр"
-        verbose_name_plural = "Числовые параметры"
-   
-
-class HazardValueProp(models.Model):
-
-    waste_component = models.ForeignKey(WasteComponent, on_delete=models.CASCADE, related_name='value_props')
-    
-
-    value_type = models.ForeignKey(HazardValueType, on_delete=models.CASCADE, related_name='valprops')
-    prop_float_value = models.FloatField(blank=False, 
-                                         null=False,
-                                         verbose_name='Числовое значение')
-    literature_source = models.ForeignKey(LiteratureSource, on_delete=models.CASCADE, related_name='value_props')
-
-    def get_score(self):
-
-        return self.value_type.get_score(self.prop_float_value)
-
-    def __str__(self):
-        return f'{self.value_type} - диапазон значений от плохого к хорошему: {self.value_type.bad_val} - {self.value_type.average_val} - {self.value_type.good_val}'
-
-    
-    class Meta:
-        verbose_name = "Числовое свойство"
-        verbose_name_plural = "Числовые свойства"
-
-
-
-
-
-class HazardClassProp(models.Model):
-
-    waste_component = models.ForeignKey(WasteComponent, on_delete=models.CASCADE, related_name='class_props')
-    
-
-    value_type = models.ForeignKey(HazardClassType, on_delete=models.CASCADE, related_name='classprops')
-    prop_class_value = models.PositiveSmallIntegerField(blank=False, 
-                                                 null=False,                                                       
-                                                 verbose_name='Класс опасности')
-    literature_source = models.ForeignKey(LiteratureSource, 
-                                          on_delete=models.CASCADE, 
-                                          related_name='class_props',
-                                          verbose_name='Литература')
-
-    def __str__(self):
-        return \
-        f'{self.value_type} - возможные значения 1- {self.value_type.class1_item}, 2 - {self.value_type.class2_item},\
-         3 - {self.value_type.class3_item}, 4 - {self.value_type.class4_item}'
-
-
-    def get_score(self):
-
-        return self.prop_class_value
-
-   

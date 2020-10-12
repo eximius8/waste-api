@@ -1,28 +1,21 @@
 from django.contrib import admin
 
-from chemcomponent.models import  HazardValueProp, HazardClassProp, HazardValueType, HazardClassType, WasteComponent, LiteratureSource
+from chemcomponent.models import WasteComponent
+from componentprop.models import HazardValueProp, HazardCategoryProp
 
-
-@admin.register(HazardValueType)
-class HazardValueTypeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'bad_val', 'average_val', 'good_val')
-
-@admin.register(HazardClassType)
-class HazardValueTypeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'class1_item', 'class2_item', 'class3_item', 'class4_item')
 
 class ValuePropInline(admin.TabularInline):
     model = HazardValueProp
 
-class ClassPropInline(admin.TabularInline):
-    model = HazardClassProp
+class CategoryPropInline(admin.TabularInline):
+    model = HazardCategoryProp
 
 @admin.register(WasteComponent)
 class WasteComponentAdmin(admin.ModelAdmin):
     list_display = ('name', 'chemical_type', 'W', 'log_W', 'unique_props', 'Binf')
     inlines = [
         ValuePropInline,
-        ClassPropInline,
+        CategoryPropInline,
     ]
     
     def W(self, obj):
@@ -40,21 +33,22 @@ class WasteComponentAdmin(admin.ModelAdmin):
 
 
 
-@admin.register(HazardValueProp)
-class HazardPropAdmin(admin.ModelAdmin):
-    list_display = ('waste_component', 'value_type', 'prop_float_value', 'score', 'literature_source')
 
-    def score(self, obj):
-        return obj.get_score()
 
-@admin.register(HazardClassProp)
-class HazardPropAdmin(admin.ModelAdmin):
-    list_display = ('waste_component', 'value_type',  'score', 'literature_source')
+# # @admin.register(HazardValueProp)
+# # class HazardPropAdmin(admin.ModelAdmin):
+# #     list_display = ('waste_component', 'value_type', 'prop_float_value', 'score', 'literature_source')
 
-    def score(self, obj):
-        return obj.get_score()
+# #     def score(self, obj):
+# #         return obj.get_score()
+
+# # @admin.register(HazardClassProp)
+# # class HazardPropAdmin(admin.ModelAdmin):
+# #     list_display = ('waste_component', 'value_type',  'score', 'literature_source')
+
+# #     def score(self, obj):
+# #         return obj.get_score()
     
 
    
 
-admin.site.register(LiteratureSource)

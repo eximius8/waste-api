@@ -1,0 +1,123 @@
+from django.db import models
+from django.core.exceptions import ValidationError
+
+class AbstractHazardPropType(models.Model):
+    
+   # importance = models.PositiveSmallIntegerField(blank=False, verbose_name='Важность', unique=True)
+    name = models.CharField(max_length=400, blank=False, verbose_name="Название")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        abstract = True
+
+class HazardCategoryType(AbstractHazardPropType):    
+
+    category1_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 1")
+    category2_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 2")
+    category3_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 3")
+    category4_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 4")
+
+    class Meta:
+        verbose_name = "Категория классификации"
+        verbose_name_plural = "Категории классификации"
+
+
+class HazardValueType(AbstractHazardPropType):    
+
+    bad_val = models.FloatField(blank=False, verbose_name="Значение выше или меньше которого класс опасности = 1")
+    average_val = models.FloatField(blank=False, verbose_name="Среднее значение")
+    good_val = models.FloatField(blank=False, verbose_name="Значение выше или меньше которого класс опасности = 4")
+
+    def get_score(self, obj_value):
+        if self.good_val < self.bad_val:
+            if obj_value < self.good_val:
+                return 4
+            elif obj_value > self.bad_val:
+                return 1
+            elif self.good_val <= obj_value <= self.average_val:
+                return 3
+            elif self.average_val < obj_value <= self.bad_val:
+                return 2
+
+        if obj_value > self.good_val:
+            return 4
+        elif obj_value < self.bad_val:
+            return 1
+        elif self.average_val <= obj_value <= self.good_val:
+            return 3
+        elif self.bad_val < obj_value <= self.average_val:
+            return 2
+
+
+    def clean(self):
+        if self.good_val < self.bad_val and (self.average_val < self.good_val or self.average_val > self.bad_val):
+            raise ValidationError(f'Среднее значение должно быть между {self.good_val} и {self.bad_val}')
+        
+        if self.bad_val < self.good_val and (self.average_val < self.bad_val or self.average_val > self.good_val):
+            raise ValidationError(f'Среднее значение должно быть между {self.bad_val} и {self.good_val}')
+   
+
+    class Meta:
+        verbose_name = "Числовой параметр"
+        verbose_name_plural = "Числовые параметры"
+   
+
+class HazardValueProp(models.Model):
+
+    waste_component = models.ForeignKey('chemcomponent.WasteComponent', on_delete=models.CASCADE, related_name='value_props')
+    value_type = models.ForeignKey(HazardValueType, on_delete=models.CASCADE, related_name='value_props')
+    prop_float_value = models.FloatField(blank=False, 
+                                         null=False,
+                                         verbose_name='Числовое значение')
+    literature_source = models.ForeignKey('litsource.LiteratureSource', 
+                                          on_delete=models.CASCADE, 
+                                          related_name='value_props', 
+                                          verbose_name='Литература')
+
+    def get_score(self):
+
+        return self.value_type.get_score(self.prop_float_value)
+
+    def __str__(self):
+        return f'{self.value_type} - диапазон значений от плохого к хорошему: \
+         {self.value_type.bad_val} - {self.value_type.average_val} - {self.value_type.good_val}'
+
+    
+    class Meta:
+        verbose_name = "Числовое свойство"
+        verbose_name_plural = "Числовые свойства"
+
+
+
+
+
+class HazardCategoryProp(models.Model):
+
+    waste_component = models.ForeignKey('chemcomponent.WasteComponent', on_delete=models.CASCADE, related_name='category_props')   
+
+    value_type = models.ForeignKey(HazardCategoryType, on_delete=models.CASCADE, related_name='category_props')
+    prop_category_value = models.PositiveSmallIntegerField(blank=False, 
+                                                 null=False,                                                       
+                                                 verbose_name='Класс опасности')
+    literature_source = models.ForeignKey('litsource.LiteratureSource', 
+                                          on_delete=models.CASCADE, 
+                                          related_name='category_props',
+                                          verbose_name='Литература')
+
+    def __str__(self):
+        return \
+        f'{self.value_type} - возможные значения 1- {self.value_type.category1_item}, 2 - {self.value_type.category2_item},\
+         3 - {self.value_type.category3_item}, 4 - {self.value_type.category4_item}'
+
+
+    def get_score(self):
+
+        return self.prop_category_value
+
+    class Meta:
+        verbose_name = "Свойство классификации"
+        verbose_name_plural = "Свойства классификации"
+
+   
