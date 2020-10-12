@@ -7,8 +7,8 @@ class WasteClass(models.Model):
 
     name = models.CharField(max_length=1000, blank=False, verbose_name="Название отхода")
     components = models.ManyToManyField('chemcomponent.WasteComponent', through='waste.Concentration')
-
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE,)
+    #visibility = models.BooleanField(default=False, blank=False, null=False, verbose_name="Отход виден всем")
 
     def get_summ_K(self):
         
