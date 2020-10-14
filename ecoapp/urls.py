@@ -8,6 +8,8 @@ from wagtail.documents import urls as wagtaildocs_urls
 
 from search import views as search_views
 
+from waste.views import WasteDetailView
+
 urlpatterns = [
     path('django-admin/', admin.site.urls),
 
@@ -15,6 +17,8 @@ urlpatterns = [
     path('documents/', include(wagtaildocs_urls)),
 
     path('search/', search_views.search, name='search'),
+
+    path('waste/<int:pk>/', WasteDetailView.as_view(), name='waste-detail'),
 
 ]
 

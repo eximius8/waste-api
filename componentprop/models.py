@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+#import json
 
 class AbstractHazardPropType(models.Model):
     
@@ -76,6 +77,18 @@ class HazardValueProp(models.Model):
                                           related_name='value_props', 
                                           verbose_name='Литература')
 
+    def get_json(self):
+        json_prop_data = {}
+        json_prop_data['name'] = self.value_type.name
+        json_prop_data['data'] = {
+                            'litsource': self.literature_source.name,
+                            'value': self.prop_float_value,
+                            'score': self.get_score()  
+                            }      
+
+        return json_prop_data
+
+
     def get_score(self):
 
         return self.value_type.get_score(self.prop_float_value)
@@ -110,6 +123,19 @@ class HazardCategoryProp(models.Model):
         return \
         f'{self.value_type} - возможные значения 1- {self.value_type.category1_item}, 2 - {self.value_type.category2_item},\
          3 - {self.value_type.category3_item}, 4 - {self.value_type.category4_item}'
+    
+    def get_json(self):
+        json_prop_data = {}
+        json_prop_data['name'] = self.value_type.name        
+        string = f"self.value_type.category{self.prop_category_value}_item"       
+        
+        json_prop_data['data'] = {
+                            'litsource': self.literature_source.name,
+                            'value': eval(string),
+                            'score': self.get_score()  
+                            }           
+
+        return json_prop_data
 
 
     def get_score(self):

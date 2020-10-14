@@ -35,7 +35,22 @@ class WasteComponent(models.Model):
         if self.w_value and not self.lit_source:
             raise ValidationError(f'При задании коэффициента W, необходимо указать источник литературы, откуда он взят')      
 
-                           
+    def get_props(self):
+
+        if not self.value_props.exists() and not self.category_props.exists():
+            return ""
+        
+        props = {}
+        for prop in self.value_props.all():
+            data = prop.get_json()
+            props[data['name']]=data["data"]
+
+        for prop in self.category_props.all():
+            data = prop.get_json()
+            props[data['name']]=data["data"]
+
+        return props
+
     
 
     def get_num_unique_props(self):
@@ -108,6 +123,9 @@ class WasteComponent(models.Model):
         """
         относительный параметр опасности компонента отхода для окружающей среды
         """
+        if self.chemical_type == 'S':
+            return 4.
+
         BigX = 0
         num_props = 0     
        
