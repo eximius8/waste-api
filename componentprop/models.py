@@ -99,8 +99,15 @@ class HazardValueProp(models.Model):
 
     
     class Meta:
+
+        unique_together = ['waste_component', 'value_type']
         verbose_name = "Числовое свойство"
         verbose_name_plural = "Числовые свойства"
+    
+    def clean(self):
+
+        if self.prop_float_value <= 0:
+            raise ValidationError('Числовое значение не может быть меньше или равным 0')
 
 
 
@@ -143,7 +150,14 @@ class HazardCategoryProp(models.Model):
         return self.prop_category_value
 
     class Meta:
+
+        unique_together = ['waste_component', 'value_type']
         verbose_name = "Свойство классификации"
         verbose_name_plural = "Свойства классификации"
+
+    def clean(self):
+
+        if self.prop_category_value not in range(1,5):
+            raise ValidationError('Не может быть меньше 1 или больше 4')
 
    
