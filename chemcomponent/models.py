@@ -31,9 +31,7 @@ class WasteComponent(models.Model):
                                     related_name='waste_components', 
                                     verbose_name='Источник литературы (если задано числовое значение W, то обязателен)')
 
-    def clean(self):
-        if self.w_value and not self.lit_source:
-            raise ValidationError(f'При задании коэффициента W, необходимо указать источник литературы, откуда он взят')      
+    
 
     def get_props(self):
 
@@ -83,6 +81,7 @@ class WasteComponent(models.Model):
         """
         Функция считает коэффициента степени опасности компонента
         если компонент безопасен возвращает 10^6
+        если значение w задано в базе возвращает значение из базы
         """
         if self.chemical_type == 'S':
             return 1000000.
@@ -154,6 +153,10 @@ class WasteComponent(models.Model):
 
     def __str__(self):
         return f'{self.name} ({self.get_chemical_type_display()})'
+    
+    def clean(self):
+        if self.w_value and not self.lit_source:
+            raise ValidationError(f'При задании коэффициента W, необходимо указать источник литературы, откуда он взят')      
     
     class Meta:
         verbose_name = "Компонент отхода"
