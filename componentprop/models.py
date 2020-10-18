@@ -50,6 +50,7 @@ class HazardValueType(AbstractHazardPropType):
             return 3
         elif self.bad_val < obj_value <= self.average_val:
             return 2
+        
 
 
     def clean(self):
@@ -105,6 +106,9 @@ class HazardValueProp(models.Model):
         verbose_name_plural = "Числовые свойства"
     
     def clean(self):
+
+        if not self.prop_float_value:
+            raise ValidationError('Введите числовое значение')
 
         if self.prop_float_value <= 0:
             raise ValidationError('Числовое значение не может быть меньше или равным 0')
