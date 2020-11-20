@@ -14,11 +14,14 @@ from search import views as search_views
 from waste.views import WasteDetailView
 import chemcomponent.views as comp_views
 import componentprop.views as prop_views
+import waste.views as waste_views
 
 router = routers.DefaultRouter()                      
 router.register(r'components', comp_views.ComponenterView, 'component')
 router.register(r'categoryprops', prop_views.CategoryPropView, 'categoryprop')
 router.register(r'valueprops', prop_views.ValuePropView, 'valueprop')
+router.register(r'valueprops', prop_views.ValuePropView, 'valueprop')
+
 
 urlpatterns = [
     path('django-admin/', admin.site.urls),

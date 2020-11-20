@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     # 3rd party
     #'corsheaders',
     'rest_framework',
+    'wagtail.api.v2',
 ]
 
 MIDDLEWARE = [

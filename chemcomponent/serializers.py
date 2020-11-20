@@ -1,7 +1,8 @@
 from rest_framework import serializers
-
-
 from .models import WasteComponent
+
+
+
 
 class WasteComponentListSerializer(serializers.ModelSerializer):
 
@@ -12,6 +13,6 @@ class WasteComponentListSerializer(serializers.ModelSerializer):
     class Meta:
 
         model = WasteComponent
-        read_only_fields = ('lit_source', 'category_props', 'value_props', )       
-        fields = ('id', 'name', 'chemical_type', 'w_value', 'lit_source', 'category_props', 'value_props',  )
+        read_only_fields = ('id', 'name', 'chemical_type', 'w_value')#, 'lit_source', 'category_props', 'value_props', )       
+        fields = ('id', 'name', 'chemical_type', 'w_value')#, 'lit_source', 'category_props', 'value_props',  )
         

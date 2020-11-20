@@ -10,8 +10,7 @@ class WasteComponent(models.Model):
     Класс для компонентов отхода
     """    
     name = models.CharField(max_length=400, blank=False, verbose_name="Название")
-    CHOICES = (
-        ('S', 'Неопасное W=10^6'), 
+    CHOICES = (        
         ('O', 'Органическое'),
         ('I', 'Неорганическое'),          
     )
