@@ -5,6 +5,16 @@ from .models import WasteComponent
 
 
 class WasteComponentListSerializer(serializers.ModelSerializer):
+   
+
+    class Meta:
+
+        model = WasteComponent
+        read_only_fields = ('id', 'name')
+        fields = ('id', 'name')
+        
+
+class WasteComponentSerializer(serializers.ModelSerializer):
 
     #category_props = CategoryPropSerializer(many=True, read_only=True)
     #value_props = ValuePropSerializer(many=True, read_only=True)
@@ -13,6 +23,5 @@ class WasteComponentListSerializer(serializers.ModelSerializer):
     class Meta:
 
         model = WasteComponent
-        read_only_fields = ('id', 'name', 'chemical_type', 'w_value')#, 'lit_source', 'category_props', 'value_props', )       
-        fields = ('id', 'name', 'chemical_type', 'w_value')#, 'lit_source', 'category_props', 'value_props',  )
-        
+        read_only_fields = ('id', 'name', 'other_names', 'w_value')#, 'chemical_type', 'lit_source', 'category_props', 'value_props', )       
+        fields = ('id', 'name', 'other_names', 'w_value')#, 'chemical_type', 'lit_source', 'category_props', 'value_props',  )

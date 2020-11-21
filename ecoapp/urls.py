@@ -16,11 +16,11 @@ import chemcomponent.views as comp_views
 import componentprop.views as prop_views
 import waste.views as waste_views
 
-router = routers.DefaultRouter()                      
-router.register(r'components', comp_views.ComponenterView, 'component')
-router.register(r'categoryprops', prop_views.CategoryPropView, 'categoryprop')
-router.register(r'valueprops', prop_views.ValuePropView, 'valueprop')
-router.register(r'valueprops', prop_views.ValuePropView, 'valueprop')
+#router = routers.DefaultRouter()                      
+#router.register(r'components', comp_views.ComponenterView, 'component')
+#router.register(r'categoryprops', prop_views.CategoryPropView, 'categoryprop')
+#router.register(r'valueprops', prop_views.ValuePropView, 'valueprop')
+
 
 
 urlpatterns = [
@@ -31,8 +31,12 @@ urlpatterns = [
 
     path('search/', search_views.search, name='search'),
 
-    path('waste/<int:pk>/', WasteDetailView.as_view(), name='waste-detail'),
-    path('api/', include(router.urls))  
+    #path('waste/<int:pk>/', WasteDetailView.as_view(), name='waste-detail'),
+    path('api/component/<int:pk>/', comp_views.ComponentView.as_view(), name='component'),
+    path('api/components/', comp_views.ComponentsView.as_view(), name='components'),
+    
+    
+   # path('api/', include(router.urls))  
 
 ]
 

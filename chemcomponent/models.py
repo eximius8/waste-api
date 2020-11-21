@@ -10,6 +10,7 @@ class WasteComponent(models.Model):
     Класс для компонентов отхода
     """    
     name = models.CharField(max_length=400, blank=False, verbose_name="Название")
+    other_names = models.CharField(max_length=1000, blank=True, default="", verbose_name="Другие названия (через запятую)")
     CHOICES = (        
         ('O', 'Органическое'),
         ('I', 'Неорганическое'),          
@@ -17,7 +18,7 @@ class WasteComponent(models.Model):
 
     chemical_type = models.CharField(max_length=1, 
                                      blank=False, 
-                                     default = 'S', 
+                                     default = 'O', 
                                      choices=CHOICES, 
                                      verbose_name="Тип")
     w_value = models.FloatField(blank=True, 
@@ -82,8 +83,8 @@ class WasteComponent(models.Model):
         если компонент безопасен возвращает 10^6
         если значение w задано в базе возвращает значение из базы
         """
-        if self.chemical_type == 'S':
-            return 1000000.
+        #if self.chemical_type == 'S':
+        #    return 1000000.
         if self.w_value:
             return self.w_value
 
@@ -95,9 +96,9 @@ class WasteComponent(models.Model):
         Функция считает логарифм от коэффициента степени опасности компонента
         уточнить логарифм десятичный или какой-то другой
         """
-        if self.chemical_type == 'S':
+        #if self.chemical_type == 'S':
+         #   return 6.
 
-            return 6.
         if self.w_value:
             return math.log10(self.w_value)
 
@@ -121,8 +122,8 @@ class WasteComponent(models.Model):
         """
         относительный параметр опасности компонента отхода для окружающей среды
         """
-        if self.chemical_type == 'S':
-            return 4.
+       # if self.chemical_type == 'S':
+        #    return 4.
 
         BigX = 0
         num_props = 0     
