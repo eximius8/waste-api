@@ -11,7 +11,7 @@ from wagtail.documents import urls as wagtaildocs_urls
 from search import views as search_views
 
 # local
-from waste.views import WasteDetailView
+
 import chemcomponent.views as comp_views
 import componentprop.views as prop_views
 import waste.views as waste_views
@@ -31,9 +31,11 @@ urlpatterns = [
 
     path('search/', search_views.search, name='search'),
 
-    #path('waste/<int:pk>/', WasteDetailView.as_view(), name='waste-detail'),
+
+    path(r'api/waste/get-w/', waste_views.calculate_safety_klass_view, name='waste-klass'),
     path('api/component/<int:pk>/', comp_views.ComponentView.as_view(), name='component'),
-    path('api/components/', comp_views.ComponentsView.as_view(), name='components'),
+    path(r'api/components/', comp_views.ComponentsView.as_view(), name='components'),
+    
     
     
    # path('api/', include(router.urls))  

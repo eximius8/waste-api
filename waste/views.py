@@ -1,26 +1,16 @@
-from django.views.generic import DetailView
-from rest_framework import viewsets, permissions, filters
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
-from .models import WasteClass
-from .serializers import WasteClassSerializer, ConcentrationSerializer
+from .serializers import WasteClassSerializer
 
-                  
 
-class WasteClassView(viewsets.ModelViewSet):
+
+@api_view(['POST',])
+def calculate_safety_klass_view(request):
+
+    newobj = WasteClassSerializer(request.data)
+    print(newobj)
     
-    permission_classes = [permissions.IsAuthenticated,]
-    serializer_class = WasteClassSerializer          
-    queryset = WasteClass.objects.all()
-
-
-class WasteDetailView(DetailView):
-
-    model = WasteClass
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
-        context = super().get_context_data(**kwargs)
-
-        waste = self.get_object()
-        waste.generate_report()
-        return context
+    return Response({"message": "Got some data!", "data": request.data})
+    
+       
