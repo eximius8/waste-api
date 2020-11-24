@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 import math
 
@@ -23,7 +24,8 @@ class WasteComponent(models.Model):
                                      verbose_name="Тип")
     w_value = models.FloatField(blank=True, 
                                 null=True, 
-                                verbose_name="W - Коэффициента степени опасности компонента (если известен - указание источника обязательно)")
+                                verbose_name="W - Коэффициента степени опасности компонента (если известен - указание источника обязательно)",
+                                validators=[MinValueValidator(1.0),MaxValueValidator(1e6)])
     lit_source = models.ForeignKey('litsource.LiteratureSource',
                                     blank=True, 
                                     null=True, 
@@ -34,9 +36,12 @@ class WasteComponent(models.Model):
     
 
     def get_props(self):
+        """
+        returns array of all props in {'prop': value} format
+        """
 
         if not self.value_props.exists() and not self.category_props.exists():
-            return ""
+            return {}
         
         props = {}
         for prop in self.value_props.all():
@@ -50,30 +55,12 @@ class WasteComponent(models.Model):
         return props
 
     
-
-    def get_num_unique_props(self):
-        """
-        get number of hazard_props with unique importances
-        should be updated to distinct
-        """       
-        prop_num = self.category_props.count() + self.value_props.count()
-           
-        if prop_num < 6:
-            Binf = 1
-        elif 6 <= prop_num <= 8:
-            Binf = 2
-        elif 8 < prop_num <= 10:
-            Binf = 3
-        else:
-            Binf = 4
-
-        return [prop_num, Binf]
-   
+  
     def get_k(self, conc):
         """
         Показатель опасности компонента отхода 
         conc - концентрация в мг/кг
-        """
+        """       
         return conc/self.get_w()
 
 
@@ -82,12 +69,9 @@ class WasteComponent(models.Model):
         Функция считает коэффициента степени опасности компонента
         если компонент безопасен возвращает 10^6
         если значение w задано в базе возвращает значение из базы
-        """
-        #if self.chemical_type == 'S':
-        #    return 1000000.
+        """      
         if self.w_value:
             return self.w_value
-
 
         return 10.**self.get_log_w()
     
@@ -95,9 +79,7 @@ class WasteComponent(models.Model):
         """
         Функция считает логарифм от коэффициента степени опасности компонента
         уточнить логарифм десятичный или какой-то другой
-        """
-        #if self.chemical_type == 'S':
-         #   return 6.
+        """      
 
         if self.w_value:
             return math.log10(self.w_value)
@@ -121,18 +103,14 @@ class WasteComponent(models.Model):
     def get_x(self):
         """
         относительный параметр опасности компонента отхода для окружающей среды
-        """
-       # if self.chemical_type == 'S':
-        #    return 4.
+        """    
 
         BigX = 0
         num_props = 0     
        
-        for value_prop in self.value_props.all():
+        for value_prop in self.value_props.all():           
             BigX += value_prop.get_score()
             num_props += 1
-            # if not value_prop.value_type.importance in x:                
-            #     x.add(value_prop.value_type.importance)
                 
         for category_prop in self.category_props.all():
             BigX += category_prop.get_score()

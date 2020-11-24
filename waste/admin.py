@@ -1,12 +1,12 @@
 from django.contrib import admin
 
-from waste.models import WasteClass, Concentration
+from waste.models import WasteClass, ConcentrationClass
 from chemcomponent.models import WasteComponent
 
 
 
 class WasteComponentInline(admin.TabularInline):
-    model = Concentration
+    model = ConcentrationClass
 
 
 

@@ -11,7 +11,7 @@ import json
 class WasteClass(models.Model):
 
     name = models.CharField(max_length=1000, blank=False, verbose_name="Название отхода")
-    components = models.ManyToManyField('chemcomponent.WasteComponent', through='waste.Concentration')
+    components = models.ManyToManyField('chemcomponent.WasteComponent', through='waste.ConcentrationClass')
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE,)
     fkko = models.CharField(max_length=50, blank=True, null=True, verbose_name="Код ФККО")
     #visibility = models.BooleanField(default=False, blank=False, null=False, verbose_name="Отход виден всем")
@@ -41,24 +41,30 @@ class WasteClass(models.Model):
                                     "k": "%.2f" % concentration.get_K(),
                                     "props": concentration.component.get_props(),
                                 }
-        data["safe_components"] = self.get_safe_components() 
+        #data["safe_components"] = self.get_safe_components() 
 
 
 
         context = json.dumps(data,ensure_ascii=False).encode('utf8')
         generate_waste_rep(context = context)
 
-    def get_summ_K(self):        
-        
+    def get_summ_K(self, fake_objs):
+
         k=0
-        for component in self.concentrations.all():
+        if fake_objs:
+            concentrations=fake_objs
+        else:
+            concentrations=self.concentrations.all()
+        
+        for component in concentrations:
             k += component.get_K()        
         return k
     
-    def get_safety_class(self):
-        
+    def get_safety_class(self, fake_objs=False):
 
-        k = self.get_summ_K()
+               
+
+        k = self.get_summ_K(fake_objs=fake_objs)
         if k <= 10:
             return "V"
         elif 10 < k <= 100:
@@ -72,7 +78,7 @@ class WasteClass(models.Model):
           
 
 
-class Concentration(models.Model):
+class ConcentrationClass(models.Model):
 
     waste = models.ForeignKey(WasteClass, on_delete=models.CASCADE, related_name="concentrations")
     component = models.ForeignKey('chemcomponent.WasteComponent', on_delete=models.CASCADE, related_name="concentrations")

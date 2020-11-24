@@ -1,8 +1,12 @@
 from django.db import models
 from django.core.exceptions import ValidationError
-#import json
+
 
 class AbstractHazardPropType(models.Model):
+    """
+    Тип свойства это такие вещи как ПДК, мутагенность и т.д.
+    индивидуальны для каждого компонента
+    """
     
    # importance = models.PositiveSmallIntegerField(blank=False, verbose_name='Важность', unique=True)
     name = models.CharField(max_length=400, blank=False, verbose_name="Название")
@@ -27,30 +31,31 @@ class HazardCategoryType(AbstractHazardPropType):
 
 class HazardValueType(AbstractHazardPropType):    
 
-    bad_val = models.FloatField(blank=False, verbose_name="Значение выше или меньше которого класс опасности = 1")
+    bad_val = models.FloatField(blank=False, verbose_name="Значение больше или меньше которого класс опасности = 1")
     average_val = models.FloatField(blank=False, verbose_name="Среднее значение")
-    good_val = models.FloatField(blank=False, verbose_name="Значение выше или меньше которого класс опасности = 4")
+    good_val = models.FloatField(blank=False, verbose_name="Значение больше или меньше которого класс опасности = 4")
 
     def get_score(self, obj_value):
+        
         if self.good_val < self.bad_val:
             if obj_value < self.good_val:
                 return 4
-            elif obj_value > self.bad_val:
-                return 1
             elif self.good_val <= obj_value <= self.average_val:
                 return 3
             elif self.average_val < obj_value <= self.bad_val:
                 return 2
+            elif obj_value > self.bad_val:
+                return 1            
+            
 
         if obj_value > self.good_val:
             return 4
-        elif obj_value < self.bad_val:
-            return 1
         elif self.average_val <= obj_value <= self.good_val:
             return 3
-        elif self.bad_val < obj_value <= self.average_val:
+        elif self.bad_val <= obj_value < self.average_val:
             return 2
-        
+        elif obj_value < self.bad_val:
+            return 1
 
 
     def clean(self):
@@ -67,6 +72,9 @@ class HazardValueType(AbstractHazardPropType):
    
 
 class HazardValueProp(models.Model):
+    """
+    Само свойство (числовое значение или категория) - относится как компоненту отхода так и имеет тип (ПДК мутагенность и т.п.)
+    """
 
     waste_component = models.ForeignKey('chemcomponent.WasteComponent', on_delete=models.CASCADE, related_name='value_props')
     value_type = models.ForeignKey(HazardValueType, on_delete=models.CASCADE, related_name='value_props')
@@ -90,7 +98,8 @@ class HazardValueProp(models.Model):
         return json_prop_data
 
 
-    def get_score(self):
+    def get_score(self):      
+        
 
         return self.value_type.get_score(self.prop_float_value)
 
@@ -132,7 +141,7 @@ class HazardCategoryProp(models.Model):
 
     def __str__(self):
         return \
-        f'{self.value_type} - возможные значения 1- {self.value_type.category1_item}, 2 - {self.value_type.category2_item},\
+        f'{self.value_type} - возможные значения 1 - {self.value_type.category1_item}, 2 - {self.value_type.category2_item},\
          3 - {self.value_type.category3_item}, 4 - {self.value_type.category4_item}'
     
     def get_json(self):
