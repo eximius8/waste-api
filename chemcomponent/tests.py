@@ -15,6 +15,22 @@ class WasteComponentTests(TestCase):
                                                                     category2_item="2",
                                                                     category3_item="3",
                                                                     category4_item="Не установлен")
+
+        self.klass_op_xoz_voda = HazardCategoryType.objects.create(category1_item="1",
+                                                                    category2_item="2",
+                                                                    category3_item="3",
+                                                                    category4_item="4")
+
+        self.klass_op_fish_water = HazardCategoryType.objects.create(category1_item="1",
+                                                                    category2_item="2",
+                                                                    category3_item="3",
+                                                                    category4_item="4")
+
+        self.klass_op_air = HazardCategoryType.objects.create(category1_item="1",
+                                                                    category2_item="2",
+                                                                    category3_item="3",
+                                                                    category4_item="4")
+
         self.pdk_pochva = HazardValueType.objects.create(bad_val=1.,
                                                         average_val=10.,
                                                         good_val=100.)
@@ -22,8 +38,61 @@ class WasteComponentTests(TestCase):
                                                      average_val=.1,
                                                      good_val=1.)
 
+        self.pdk_voda = HazardValueType.objects.create(bad_val=.001,
+                                                     average_val=.01,
+                                                     good_val=1.)
+                                                    
+        self.pdk_r_h = HazardValueType.objects.create(bad_val=.001,
+                                                     average_val=.01,
+                                                     good_val=0.1)
       
         self.gost_src = LiteratureSource.objects.create(name="Gost", latexpart="Bred")
+
+    def test_waste_component_numbers_with_many_props(self):
+        """
+        http://eco-profi.info/download_instr/47110101521_lamp.pdf
+        """
+        self.setup()
+        self.porcelain = WasteComponent.objects.create(name="Фарфор")
+        self.porcelain_pdk_v = HazardValueProp.objects.create(waste_component=self.porcelain,
+                                                              value_type=self.pdk_voda,
+                                                              prop_float_value=0.25,
+                                                              literature_source=self.gost_src)
+
+        
+        self.porcelain_klass_op_xoz_voda = HazardCategoryProp.objects.create(waste_component=self.porcelain,
+                                                                            value_type=self.klass_op_xoz_voda,
+                                                                            prop_category_value=4,
+                                                                            literature_source=self.gost_src)
+
+        self.porcelain_pdk_r_h = HazardValueProp.objects.create(waste_component=self.porcelain,
+                                                                value_type=self.pdk_r_h,
+                                                                prop_float_value=0.5,
+                                                                literature_source=self.gost_src)
+
+        
+        self.porcelain_klass_op_fish_vod = HazardCategoryProp.objects.create(waste_component=self.porcelain,
+                                                                            value_type=self.klass_op_fish_water,
+                                                                            prop_category_value=4,
+                                                                            literature_source=self.gost_src)
+
+        self.porcelain_pdk_ss = HazardValueProp.objects.create(waste_component=self.porcelain,
+                                                              value_type=self.pdk_ss,
+                                                              prop_float_value=0.03,
+                                                              literature_source=self.gost_src)
+
+        
+        self.porcelain_klass_op_air = HazardCategoryProp.objects.create(waste_component=self.porcelain,
+                                                                            value_type=self.klass_op_air,
+                                                                            prop_category_value=2,
+                                                                            literature_source=self.gost_src)                                                                                                                                    
+
+        self.assertEqual(self.porcelain.get_x(), 3.)
+        self.assertAlmostEqual(self.porcelain.get_z(), 3.67, places=2)
+        self.assertAlmostEqual(self.porcelain.get_log_w(), 3.67, places=2)
+        self.assertAlmostEqual(self.porcelain.get_k(4500), 0.969, places=1)
+        self.assertAlmostEqual(self.porcelain.get_w(), 4641.588, places=2) 
+
     
     def test_waste_component_numbers_with_1_cat_prop(self):
         """

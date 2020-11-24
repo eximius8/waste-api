@@ -35,6 +35,9 @@ class HazardCategoryTypeTests(TestCase):
         
 
         self.assertEqual(lg_type.get_score(101), 1)
+        self.assertEqual(lg_type.get_score(100), 2)
+        self.assertEqual(lg_type.get_score(50), 3)
+        self.assertEqual(lg_type.get_score(1), 3)
         self.assertEqual(lg_type.get_score(75), 2)
         self.assertEqual(lg_type.get_score(25), 3)
         self.assertEqual(lg_type.get_score(0.5), 4)

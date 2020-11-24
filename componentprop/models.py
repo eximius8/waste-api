@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
-
+from django.core.validators import MinValueValidator, MaxValueValidator 
 
 class AbstractHazardPropType(models.Model):
     """
@@ -80,6 +80,7 @@ class HazardValueProp(models.Model):
     value_type = models.ForeignKey(HazardValueType, on_delete=models.CASCADE, related_name='value_props')
     prop_float_value = models.FloatField(blank=False, 
                                          null=False,
+                                         validators=[MinValueValidator(0.),],
                                          verbose_name='Числовое значение')
     literature_source = models.ForeignKey('litsource.LiteratureSource', 
                                           on_delete=models.CASCADE, 
@@ -112,15 +113,8 @@ class HazardValueProp(models.Model):
 
         unique_together = ['waste_component', 'value_type']
         verbose_name = "Числовое свойство"
-        verbose_name_plural = "Числовые свойства"
-    
-    def clean(self):
-
-        if not self.prop_float_value:
-            raise ValidationError('Введите числовое значение')
-
-        if self.prop_float_value <= 0:
-            raise ValidationError('Числовое значение не может быть меньше или равным 0')
+        verbose_name_plural = "Числовые свойства"    
+  
 
 
 
@@ -132,8 +126,9 @@ class HazardCategoryProp(models.Model):
 
     value_type = models.ForeignKey(HazardCategoryType, on_delete=models.CASCADE, related_name='category_props')
     prop_category_value = models.PositiveSmallIntegerField(blank=False, 
-                                                 null=False,                                                       
-                                                 verbose_name='Класс опасности')
+                                                            validators=[MaxValueValidator(4),MinValueValidator(1)],
+                                                            null=False,                                                       
+                                                            verbose_name='Класс опасности')
     literature_source = models.ForeignKey('litsource.LiteratureSource', 
                                           on_delete=models.CASCADE, 
                                           related_name='category_props',
@@ -168,9 +163,5 @@ class HazardCategoryProp(models.Model):
         verbose_name = "Свойство классификации"
         verbose_name_plural = "Свойства классификации"
 
-    def clean(self):
-
-        if self.prop_category_value not in range(1,5):
-            raise ValidationError('Не может быть меньше 1 или больше 4')
 
    
