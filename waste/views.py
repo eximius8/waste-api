@@ -16,14 +16,14 @@ def calculate_safety_klass_view(request):
         fake_objs = []
         ghost_waste = WasteClass(name=data_in_serializer.validated_data['name'])        
         for conc in request.data['components']:
-            fake_objs += [ConcentrationClass(waste=ghost_waste,
-                                            conc_value=float(conc['concentrat'])*1e3,
-                                            component=WasteComponent.objects.get(pk=conc['id_val'])),]                                   
+            fake_objs += [ConcentrationClass(waste = ghost_waste,
+                                            conc_value = float(conc['concentrat'])*1e3,
+                                            component = WasteComponent.objects.get(pk=conc['id_val'])),]                                   
             
         
         return Response({
             "total_k": ghost_waste.get_summ_K(fake_objs=fake_objs),
-            "safet_class": ghost_waste.get_safety_class(fake_objs=fake_objs)})
+            "safety_class": ghost_waste.get_safety_class(fake_objs=fake_objs)})
     
     return (Response(data_in_serializer.errors))
             

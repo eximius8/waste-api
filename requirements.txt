@@ -1,2 +1,4 @@
 wagtail
-#pylatex
+psycopg2-binary
+#psycopg2
+google-cloud-pubsub

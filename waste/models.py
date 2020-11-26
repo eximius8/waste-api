@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 
-from .main import generate_waste_rep 
+#from .main import generate_waste_rep 
 
 import json
 
@@ -46,7 +46,7 @@ class WasteClass(models.Model):
 
 
         context = json.dumps(data,ensure_ascii=False).encode('utf8')
-        generate_waste_rep(context = context)
+        #generate_waste_rep(context = context)
 
     def get_summ_K(self, fake_objs):
 

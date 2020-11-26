@@ -98,12 +98,17 @@ class WasteComponent(models.Model):
         """
         унифицированный относительный параметр опасности компонента отхода для окружающей среды
         """
+        if self.w_value:
+            return self.get_log_w()
         return 4./3.*self.get_x()-1./3.
     
     def get_x(self):
         """
         относительный параметр опасности компонента отхода для окружающей среды
-        """    
+        """ 
+
+        if self.w_value:
+            return (self.get_z()+1./3.)*3./4.
 
         BigX = 0
         num_props = 0     

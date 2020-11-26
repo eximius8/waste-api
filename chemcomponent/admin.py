@@ -12,23 +12,31 @@ class CategoryPropInline(admin.TabularInline):
 
 @admin.register(WasteComponent)
 class WasteComponentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'chemical_type', 'W', 'log_W', 'unique_props', 'Binf')
+    list_display = ('name', 'chemical_type', 'X', 'Z', 'log_W', 'W', 'number_of_props')#, 'Binf')
     inlines = [
         ValuePropInline,
         CategoryPropInline,
     ]
+
+    def X(self, obj):
+        return round(obj.get_x(), 3)
+    
+    def Z(self, obj):
+        return round(obj.get_z(), 3)
+
+    def log_W(self, obj):
+        return round(obj.get_log_w(), 3)
     
     def W(self, obj):
-        return obj.get_w()
+        return round(obj.get_w(), 2)
     
-    def log_W(self, obj):
-        return obj.get_log_w()
     
-    def unique_props(self, obj):
-        return obj.get_num_unique_props()[0]
     
-    def Binf(self, obj):
-        return obj.get_num_unique_props()[1]
+    def number_of_props(self, obj):
+        return len(obj.get_props())
+    
+"""     def Binf(self, obj):
+        return obj.get_num_unique_props()[1] """
 
 
 
