@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     #'corsheaders',
     'rest_framework',
     'wagtail.api.v2',
+    'corsheaders',
    # 'django_filters',
 ]
 
@@ -79,6 +80,7 @@ REST_FRAMEWORK = {
 
 MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

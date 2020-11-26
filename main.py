@@ -1,0 +1,1 @@
+from ecoapp.wsgi import application as app

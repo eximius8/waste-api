@@ -1,4 +1,5 @@
 wagtail
 psycopg2-binary
 #psycopg2
+django-cors-headers
 google-cloud-pubsub

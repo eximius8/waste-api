@@ -22,7 +22,8 @@ SESSION_COOKIE_AGE = 600000
 # GCP credentials 
 GOOGLE_APPLICATION_CREDENTIALS = os.path.join(BASE_DIR, os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')) 
 
-
+# DRF settings
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Internationalization

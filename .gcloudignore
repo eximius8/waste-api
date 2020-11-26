@@ -4,6 +4,12 @@
 cloud_sql_proxy
 manage.py
 ecoapp/settings/dev.py
+.dockerignore
+.gitignore
+.gcloudignore
+Dockerfile
+
+.git*
 
 ### OSX ###
 .DS_Store
