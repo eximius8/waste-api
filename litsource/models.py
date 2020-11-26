@@ -3,6 +3,8 @@ from django.db import models
 class LiteratureSource(models.Model):
 
     name = models.CharField(blank=False, max_length=100, unique=True)
+    # тип источника book, article и т.п.
+    source_type = models.CharField(blank=False, max_length=10, default="art")
     
     latexpart = models.TextField(blank=False)
 

@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     'litsource',
     # отходы
     'waste',
+    # Своя модель пользователя
+    'customuser',
 
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
@@ -141,7 +143,7 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'HOST': '127.0.0.1',
-            'PORT': '3307',
+            'PORT': '3306',
             'NAME': 'waste_api',
             'USER': POSTGR_WASTE_USER,
             'PASSWORD': POSTGR_WASTE_USER_PASS,

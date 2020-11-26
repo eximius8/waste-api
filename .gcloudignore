@@ -1,7 +1,9 @@
 # Created by https://www.gitignore.io
 
-
+# local
 cloud_sql_proxy
+manage.py
+ecoapp/settings/dev.py
 
 ### OSX ###
 .DS_Store
@@ -69,6 +71,9 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
+
+# all test files
+*/tests.py
 
 # Translations
 *.mo
