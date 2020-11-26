@@ -24,12 +24,12 @@ import waste.views as waste_views
 
 
 urlpatterns = [
-    path('django-admin/', admin.site.urls),
+    path(r'api/secret/django-admin/', admin.site.urls),
 
-    path('admin/', include(wagtailadmin_urls)),
-    path('documents/', include(wagtaildocs_urls)),
+    path(r'api/secret/admin/', include(wagtailadmin_urls)),
+    #path('documents/', include(wagtaildocs_urls)),
 
-    path('search/', search_views.search, name='search'),
+    #path('search/', search_views.search, name='search'),
 
 
     path(r'api/waste/get-w/', waste_views.calculate_safety_klass_view, name='waste-klass'),
