@@ -108,6 +108,8 @@ class WasteComponent(models.Model):
         """ 
 
         if self.w_value:
+            if self.w_value == 1000000:
+                return 4.
             return (self.get_z()+1./3.)*3./4.
 
         BigX = 0

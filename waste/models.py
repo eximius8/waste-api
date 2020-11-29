@@ -65,9 +65,9 @@ class WasteClass(models.Model):
                
 
         k = self.get_summ_K(fake_objs=fake_objs)
-        if k <= 10:
+        if k == 1:
             return "V"
-        elif 10 < k <= 100:
+        elif 1 < k <= 100:
             return "IV"
         elif 100 < k <= 1000:
             return "III"

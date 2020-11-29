@@ -19,11 +19,13 @@ CONN_MAX_AGE = 1000
 
 SESSION_COOKIE_AGE = 600000
 
+# https://stackoverflow.com/questions/49166768/setting-secure-hsts-seconds-can-irreversibly-break-your-site
+SECURE_HSTS_SECONDS = 60
+
 # GCP credentials 
 GOOGLE_APPLICATION_CREDENTIALS = os.path.join(BASE_DIR, os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')) 
 
-# DRF settings
-CORS_ALLOW_ALL_ORIGINS = True
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
 
 # Internationalization
