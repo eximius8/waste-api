@@ -10,8 +10,8 @@ class WasteComponentListSerializer(serializers.ModelSerializer):
     class Meta:
 
         model = WasteComponent
-        read_only_fields = ('id', 'name')
-        fields = ('id', 'name')
+        read_only_fields = ('id', 'name', 'other_names')
+        fields = ('id', 'name', 'other_names')
         
 
 class WasteComponentSerializer(serializers.ModelSerializer):

@@ -1,11 +1,34 @@
 from django.test import TestCase
+from rest_framework.test import APIRequestFactory
 
 from .models import WasteComponent
+from .views import comp_statistics
 from componentprop.models import HazardCategoryType, HazardValueType, HazardValueProp, HazardCategoryProp
 from litsource.models import LiteratureSource
 
 
 class WasteComponentTests(TestCase):
+
+    def test_run(self):
+
+        self.for_models()
+        self.for_api()     
+
+
+    def for_models(self):
+        self.setup()
+        self.create_waste_component_numbers_with_1_cat_prop()
+        self.create_waste_component_with_1_num_prop()
+        self.create_waste_component_numbers_with_many_props()
+
+    def for_api(self):
+        
+        factory = APIRequestFactory()
+        request = factory.get('/components/total/')        
+        response = comp_statistics(request)
+
+        self.assertEqual(response.data['totalcomps'], 3)
+
 
     def setup(self):
         """
@@ -48,11 +71,11 @@ class WasteComponentTests(TestCase):
       
         self.gost_src = LiteratureSource.objects.create(name="Gost", latexpart="Bred")
 
-    def test_waste_component_numbers_with_many_props(self):
+    def create_waste_component_numbers_with_many_props(self):
         """
         http://eco-profi.info/download_instr/47110101521_lamp.pdf
         """
-        self.setup()
+        
         self.porcelain = WasteComponent.objects.create(name="Фарфор")
         self.porcelain_pdk_v = HazardValueProp.objects.create(waste_component=self.porcelain,
                                                               value_type=self.pdk_voda,
@@ -94,11 +117,11 @@ class WasteComponentTests(TestCase):
         self.assertAlmostEqual(self.porcelain.get_w(), 4641.588, places=2) 
 
     
-    def test_waste_component_numbers_with_1_cat_prop(self):
+    def create_waste_component_numbers_with_1_cat_prop(self):
         """
         http://eco-profi.info/download_instr/47110101521_lamp.pdf
         """
-        self.setup()
+        
         self.latun = WasteComponent.objects.create(name="Латунь")
         self.latun_klass_op_soil = HazardCategoryProp.objects.create(waste_component=self.latun,
                                                                     value_type=self.klass_op_soil_type,
@@ -113,12 +136,11 @@ class WasteComponentTests(TestCase):
 
     
 
-    def test_waste_component_with_1_num_prop(self):
+    def create_waste_component_with_1_num_prop(self):
         """
         http://eco-profi.info/download_instr/47110101521_lamp.pdf
         """
-        self.setup()
-                       
+                               
         self.mastika = WasteComponent.objects.create(name="Мастика")
         self.mastika_pdk_ss = HazardValueProp.objects.create(waste_component=self.mastika,
                                                             value_type=self.pdk_ss,

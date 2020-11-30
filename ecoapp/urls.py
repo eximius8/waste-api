@@ -31,10 +31,10 @@ urlpatterns = [
 
     #path('search/', search_views.search, name='search'),
 
+    path('components/', include('chemcomponent.urls')),  
 
-    path(r'api/waste/get-w/', waste_views.calculate_safety_klass_view, name='waste-klass'),
-    path('api/component/<int:pk>/', comp_views.ComponentView.as_view(), name='component'),
-    path(r'api/components/', comp_views.ComponentsView.as_view(), name='components'),
+
+    path(r'api/waste/get-w/', waste_views.calculate_safety_klass_view, name='waste-klass'),    
     
     
     
