@@ -26,15 +26,19 @@ ALLOWED_HOSTS = [
 
 # DRF CORS settings
 #CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOWED_ORIGINS 
 CORS_ALLOWED_ORIGINS = [
     "https://ma34.ru",
-    "https://www.ma34.ru",
-    "https://bezoder.web.app",
-    "https://bezoder.firebaseapp.com/",
+    "https://www.ma34.ru",    
+    "https://bezoder.firebaseapp.com",
     "https://38o6y.csb.app",
 ]
+
+#CORS_ALLOWED_ORIGIN_REGEXES = []
 
 try:
     from .local import *
 except ImportError:
     pass
+
+#python manage.py check --deploy --settings=ecoapp.settings.production

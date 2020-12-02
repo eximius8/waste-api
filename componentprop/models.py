@@ -10,6 +10,7 @@ class AbstractHazardPropType(models.Model):
     
    # importance = models.PositiveSmallIntegerField(blank=False, verbose_name='Важность', unique=True)
     name = models.CharField(max_length=400, blank=False, verbose_name="Название")
+    short_name = models.CharField(max_length=100, blank=False, default="", verbose_name="Короткое название")
 
     def __str__(self):
         return self.name
