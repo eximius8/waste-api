@@ -20,6 +20,7 @@ import waste.views as waste_views
 #router.register(r'components', comp_views.ComponenterView, 'component')
 #router.register(r'categoryprops', prop_views.CategoryPropView, 'categoryprop')
 #router.register(r'valueprops', prop_views.ValuePropView, 'valueprop')
+from .api import api_router
 
 
 
@@ -28,6 +29,7 @@ urlpatterns = [
 
     path(r'api/secret/admin/', include(wagtailadmin_urls)),
     #path('documents/', include(wagtaildocs_urls)),
+    path('content/', api_router.urls),
 
     #path('search/', search_views.search, name='search'),
 

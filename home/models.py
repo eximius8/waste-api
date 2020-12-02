@@ -6,6 +6,8 @@ from wagtail.images.blocks import ImageChooserBlock
 from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel#, PageChooserPanel
 from wagtail.core.fields import StreamField
 
+from wagtail.api import APIField
+
 
 
 class HomePage(Page):
@@ -25,6 +27,12 @@ class HomePage(Page):
     content_panels = Page.content_panels + [
         FieldPanel("subtitle"),
         StreamFieldPanel('content'),
+    ]
+
+    api_fields = [
+        APIField('title'),
+        APIField('subtitle'),
+        APIField('content'),
     ]
 
     class Meta:
