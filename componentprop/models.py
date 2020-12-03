@@ -13,7 +13,7 @@ class AbstractHazardPropType(models.Model):
     short_name = models.CharField(max_length=100, blank=False, default="", verbose_name="Короткое название")
 
     def __str__(self):
-        return self.name
+        return self.short_name
 
     class Meta:
         abstract = True
@@ -24,6 +24,10 @@ class HazardCategoryType(AbstractHazardPropType):
     category2_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 2")
     category3_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 3")
     category4_item = models.CharField(max_length=100, blank=False, verbose_name="Свойство класса 4")
+
+    def get_score(self, obj_value):
+        valu = eval(f"self.category{str(obj_value)}_item")
+        return valu
 
     class Meta:
         verbose_name = "Категория классификации"
@@ -152,6 +156,10 @@ class HazardCategoryProp(models.Model):
                             }           
 
         return json_prop_data
+
+    def get_score_str(self):
+
+        return self.value_type.get_score(self.prop_category_value)
 
 
     def get_score(self):
