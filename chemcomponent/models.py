@@ -134,6 +134,26 @@ class WasteComponent(models.Model):
             Binf = 4
                     
         return (BigX + Binf) / (num_props + 1)
+    
+    def Binf(self):
+
+        cat_props_num = self.category_props.count()
+        val_props_num = self.value_props.count()
+        
+        num_props = cat_props_num + val_props_num
+
+        if num_props < 6:
+            Binf = 1
+        elif 6 <= num_props <= 8:
+            Binf = 2
+        elif 8 < num_props <= 10:
+            Binf = 3
+        else:
+            Binf = 4
+        
+        return Binf
+
+
 
 
     def __str__(self):
