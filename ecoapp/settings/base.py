@@ -124,6 +124,7 @@ else:
     #  ./cloud_sql_proxy -instances=bezoder:us-central1:bezoder-psql=tcp:3306
     #
     #     $ cloud_sql_proxy -instances=bezoder:us-central1:bezoder-psql=tcp:3306
+    #     $ python manage.py migrate --settings=ecoapp.settings.production
     #       No static after link required 
     #       gsutil -m rsync -r ./static gs://ru-bezoder-static
 
@@ -138,13 +139,7 @@ else:
             'USER': POSTGR_WASTE_USER,
             'PASSWORD': POSTGR_WASTE_USER_PASS,
         }
-    }
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
+    }    
 
 
 
