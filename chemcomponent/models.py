@@ -136,6 +136,9 @@ class WasteComponent(models.Model):
         return (BigX + Binf) / (num_props + 1)
     
     def Binf(self):
+        """
+        Бал за информационное обеспечение
+        """
 
         cat_props_num = self.category_props.count()
         val_props_num = self.value_props.count()
@@ -152,8 +155,6 @@ class WasteComponent(models.Model):
             Binf = 4
         
         return Binf
-
-
 
 
     def __str__(self):

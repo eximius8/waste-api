@@ -31,6 +31,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://ma34.ru",
     "https://www.ma34.ru",    
     "https://bezoder.firebaseapp.com",
+    "https://bezoder.web.app",
+    "http://127.0.0.1:8000",
     "https://38o6y.csb.app",
 ]
 
