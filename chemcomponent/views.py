@@ -15,7 +15,7 @@ class ComponentsView(generics.ListAPIView):
     serializer_class = WasteComponentListSerializer
    
     filter_backends = [SearchFilter, OrderingFilter]
-    search_fields = ['name', 'other_names']
+    search_fields = ['name', 'other_names', 'cas_number']
     ordering_fields = ['name',]
 
 

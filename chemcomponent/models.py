@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 
 import math
 
@@ -32,6 +32,14 @@ class WasteComponent(models.Model):
                                     on_delete=models.SET_NULL, 
                                     related_name='waste_components', 
                                     verbose_name='Источник литературы (если задано числовое значение W, то обязателен)')
+    
+    cas_number = models.CharField(max_length=30,
+                                  verbose_name="Регистрационный номер CAS",
+                                  blank=True,
+                                  validators=[RegexValidator(regex=r"\b[1-9]{1}[0-9]{1,6}-\d{2}-\d\b",
+                                                             message="CAS код для вещества в формате 1111-11-1"),
+                                             ]
+                                 )
 
     
 
