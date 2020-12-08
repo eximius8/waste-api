@@ -137,7 +137,8 @@ class WasteComponent(models.Model):
         if self.land_concentration:
             if conc > self.land_concentration:
                 return (conc - self.land_concentration) / self.get_w()
-        return conc/1e6
+            return conc/1e6
+        return conc / self.get_w()
     
     
     
