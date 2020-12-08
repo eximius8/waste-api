@@ -6,9 +6,10 @@ class LiteratureSource(models.Model):
     name = models.CharField(blank=False, max_length=100, unique=True)
     
     # тип источника book, article и т.п.
-    CHOICES = (        
-        ('art', 'Статья'),
-        ('gost', 'ГОСТ'),          
+    CHOICES = ( 
+        ('prikaz', 'Приказ'),
+        ('gost', 'ГОСТ'),
+        ('art', 'Статья'),      
     )
     source_type = models.CharField(blank=False,
                                    choices=CHOICES,  
