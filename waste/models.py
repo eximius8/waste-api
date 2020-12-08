@@ -1,8 +1,6 @@
 from django.db import models
 from django.conf import settings
 
-#from .main import generate_waste_rep 
-
 import json
 
 
@@ -21,32 +19,34 @@ class WasteClass(models.Model):
         return list(query.values('name'))
 
 
-    def generate_report(self):
+    def generate_report(self, fake_objs, filename):
         data={}
         data['name'] = self.name
         data['fkko'] = self.fkko
-        data['safety_class'] = self.get_safety_class()
-        data["k"] = "%.2f" % self.get_summ_K()
+        data['safety_class'] = self.get_safety_class(fake_objs)
+        data["k"] = "%.2f" % self.get_summ_K(fake_objs)
         data["components"] = {}
-        data["filename"] = self.pk
+        data["filename"] = filename
 
-        for concentration in self.concentrations.all():
+        for concentration in fake_objs:
             data["components"][concentration.component.name]= \
-                                {   "concp": "%.2f" % concentration.conc_p , 
-                                    "concr": "%.2f" % concentration.conc_value, 
+                                {   "concp": "%.2f" % float(concentration.conc_value * 1e-4), 
+                                    "concr": "%.0f" % concentration.conc_value, 
                                     "xi": "%.2f" % concentration.component.get_x(), 
                                     "zi": "%.2f" % concentration.component.get_z(), 
                                     "lgw": "%.2f" % concentration.component.get_log_w(), 
-                                    "w": "%.2f" % concentration.component.get_w(), 
-                                    "k": "%.2f" % concentration.get_K(),
+                                    "w": "%.0f" % concentration.component.get_w(), 
+                                    "k": "%.1f" % concentration.get_K(),
                                     "props": concentration.component.get_props(),
                                 }
-        #data["safe_components"] = self.get_safe_components() 
-
-
-
+        #data["safe_components"] = self.get_safe_components()
         context = json.dumps(data,ensure_ascii=False).encode('utf8')
-        #generate_waste_rep(context = context)
+        import requests
+        url = 'https://us-central1-bezoder.cloudfunctions.net/safety-report/'
+        #url = 'http://0.0.0.0:8080/'
+        data = context
+        response = requests.post(url, data=data)
+        return response
 
     def get_summ_K(self, fake_objs):
 
@@ -60,14 +60,12 @@ class WasteClass(models.Model):
             k += component.get_K()        
         return k
     
-    def get_safety_class(self, fake_objs=False):
-
-               
+    def get_safety_class(self, fake_objs=False):               
 
         k = self.get_summ_K(fake_objs=fake_objs)
-        if k == 1:
+        if k <= 10:
             return "V"
-        elif 1 < k <= 100:
+        elif 10 < k <= 100:
             return "IV"
         elif 100 < k <= 1000:
             return "III"

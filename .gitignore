@@ -56,6 +56,7 @@ var/
 *.spec
 
 cloud_sql_proxy
+.vscode/
 
 # Installer logs
 pip-log.txt

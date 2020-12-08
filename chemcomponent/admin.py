@@ -13,6 +13,7 @@ class CategoryPropInline(admin.TabularInline):
 @admin.register(WasteComponent)
 class WasteComponentAdmin(admin.ModelAdmin):
     list_display = ('name', 'chemical_type', 'X', 'Z', 'log_W', 'W', 'number_of_props')#, 'Binf')
+    search_fields = ['name', 'other_names', 'cas_number']
     inlines = [
         ValuePropInline,
         CategoryPropInline,

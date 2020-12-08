@@ -29,6 +29,7 @@ class CommponSerializer(serializers.Serializer):
 class WasteSerializer(serializers.Serializer):
     components = CommponSerializer(required=True, many=True)
     name = serializers.CharField(max_length=200)
+    fkko = serializers.CharField(max_length=30)
 
     def validate_components(self, comps):        
         sum_conc = 0
