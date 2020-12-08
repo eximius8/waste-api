@@ -19,6 +19,7 @@ Dockerfile
 # Icon must end with two \r
 Icon
 .vscode/
+setup.py
 
 # Thumbnails
 ._*

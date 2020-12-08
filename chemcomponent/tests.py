@@ -12,7 +12,24 @@ class WasteComponentTests(TestCase):
     def test_run(self):
 
         self.for_models()
-        self.for_api()     
+        self.for_api()
+
+    def test_simple(self):
+
+        self.setup()
+        self.aldrin = WasteComponent.objects.create(name="Альдрин",
+                                                    lit_source=self.gost_src,
+                                                    x_value=1.855)
+        self.assertAlmostEqual(self.aldrin.get_z(), 2.14, places=1) 
+        self.assertAlmostEqual(self.aldrin.get_log_w(), 2.14, places=1)         
+        self.assertAlmostEqual(self.aldrin.get_w(), 138, places=0) 
+
+        self.benzpiren = WasteComponent.objects.create(name="benzpiren",
+                                                     lit_source=self.gost_src,
+                                                     x_value=1.6)
+        self.assertAlmostEqual(self.benzpiren.get_z(), 1.8, places=4) 
+        self.assertAlmostEqual(self.benzpiren.get_log_w(), 1.778, places=3)         
+        self.assertAlmostEqual(self.benzpiren.get_w(), 59.97, places=1) 
 
 
     def for_models(self):

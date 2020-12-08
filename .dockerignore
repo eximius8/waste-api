@@ -19,6 +19,7 @@ node_modules/
 coverage
 .python-version
 .vscode/
+setup.py
 
 # Distribution / packaging
 .Python
