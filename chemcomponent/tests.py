@@ -17,6 +17,15 @@ class WasteComponentTests(TestCase):
     def test_simple(self):
 
         self.setup()
+        self.water = WasteComponent.objects.create(name="water",
+                                                    lit_source=self.gost_src,
+                                                    x_value=4)
+        self.assertEqual(self.water.get_z(), 5) 
+        self.assertEqual(self.water.get_log_w(), 6)         
+        self.assertEqual(self.water.get_w(), 1e6) 
+
+
+
         self.aldrin = WasteComponent.objects.create(name="Альдрин",
                                                     lit_source=self.gost_src,
                                                     x_value=1.855)

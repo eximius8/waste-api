@@ -93,7 +93,7 @@ class WasteComponent(models.Model):
         elif 2. < z <= 4:
             return z
         elif 4. < z <= 5:
-            return -2. + 4. / (6 - z)
+            return 2. + 4. / (6 - z)
 
         return 1
     

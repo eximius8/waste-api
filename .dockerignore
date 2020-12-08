@@ -20,6 +20,7 @@ coverage
 .python-version
 .vscode/
 setup.py
+mpr536.csv
 
 # Distribution / packaging
 .Python

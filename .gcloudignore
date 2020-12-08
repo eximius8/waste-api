@@ -20,6 +20,7 @@ Dockerfile
 Icon
 .vscode/
 setup.py
+mpr536.csv
 
 # Thumbnails
 ._*
