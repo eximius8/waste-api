@@ -21,7 +21,7 @@ def calculate_safety_klass_view(request):
                                             conc_value = float(conc['concentrat'])*1e4,
                                             component = WasteComponent.objects.get(pk=conc['id_val'])),]                                   
             
-        #ghost_waste.generate_report(fake_objs, 'test_gcloud_upload')
+        ghost_waste.generate_report(fake_objs, 'test_gcloud_upload')
         return Response({
             "total_k": ghost_waste.get_summ_K(fake_objs=fake_objs),
             "safety_class": ghost_waste.get_safety_class(fake_objs=fake_objs)})

@@ -6,6 +6,9 @@ DEBUG = True
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '#6x@v*o3d+lx-i)4dyu=rd&4e9dxax_jsj$0%%v*c&b2c!94(f'
 
+
+CORS_ALLOW_ALL_ORIGINS = True
+
 # SECURITY WARNING: define the correct hosts in production!
 ALLOWED_HOSTS = ['*'] 
 

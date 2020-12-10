@@ -30,7 +30,7 @@ class WasteClass(models.Model):
 
         for concentration in fake_objs:
             data["components"][concentration.component.name]= \
-                                {   "concp": "%.2f" % float(concentration.conc_value * 1e-4), 
+                                {   "concp": float(concentration.conc_value * 1e-4), #"%.2f" % 
                                     "concr": "%.0f" % concentration.conc_value, 
                                     "xi": "%.2f" % concentration.component.get_x(), 
                                     "zi": "%.2f" % concentration.component.get_z(), 
@@ -38,12 +38,13 @@ class WasteClass(models.Model):
                                     "w": "%.0f" % concentration.component.get_w(), 
                                     "k": "%.1f" % concentration.get_K(),
                                     "props": concentration.component.get_props(),
+                                    "has_x": bool(concentration.component.x_value),
                                 }
         #data["safe_components"] = self.get_safe_components()
         context = json.dumps(data,ensure_ascii=False).encode('utf8')
         import requests
-        url = 'https://us-central1-bezoder.cloudfunctions.net/safety-report/'
-        #url = 'http://0.0.0.0:8080/'
+        #url = 'https://us-central1-bezoder.cloudfunctions.net/safety-report/'
+        url = 'http://0.0.0.0:8080/'
         data = context
         response = requests.post(url, data=data)
         return response
