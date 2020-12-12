@@ -22,13 +22,14 @@ class WasteClass(models.Model):
     def generate_report(self, fake_objs, filename):
         data={}
         data['name'] = self.name
-        data['fkko'] = self.fkko
+        data['fkko'] = ""# self.fkko
         data['safety_class'] = self.get_safety_class(fake_objs)
         data["k"] = "%.2f" % self.get_summ_K(fake_objs)
         data["components"] = {}
         data["filename"] = filename
 
         for concentration in fake_objs:
+            
             data["components"][concentration.component.name]= \
                                 {   "concp": float(concentration.conc_value * 1e-4), #"%.2f" % 
                                     "concr": "%.0f" % concentration.conc_value, 
@@ -39,6 +40,7 @@ class WasteClass(models.Model):
                                     "k": "%.1f" % concentration.get_K(),
                                     "props": concentration.component.get_props(),
                                     "has_x": bool(concentration.component.x_value),
+                                    "has_soil_c": bool(concentration.component.land_concentration),
                                 }
         #data["safe_components"] = self.get_safe_components()
         context = json.dumps(data,ensure_ascii=False).encode('utf8')

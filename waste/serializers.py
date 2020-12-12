@@ -14,7 +14,7 @@ def component_exists(value):
 class CommponSerializer(serializers.Serializer):
     
     id_val = serializers.IntegerField(min_value=0, validators=[component_exists,])
-    concentrat = serializers.FloatField(min_value=0., max_value=100.)
+    concentration = serializers.FloatField(min_value=0., max_value=100.)
 
 """ {
 "name": "New waste",
@@ -34,7 +34,7 @@ class WasteSerializer(serializers.Serializer):
     def validate_components(self, comps):        
         sum_conc = 0
         for component in comps:
-            sum_conc += float(component['concentrat'])
+            sum_conc += float(component['concentration'])
         if sum_conc > 100:
             raise serializers.ValidationError("Сумма всех концентраций не может быть больше 100!")
 

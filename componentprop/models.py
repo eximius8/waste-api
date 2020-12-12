@@ -96,7 +96,7 @@ class HazardValueProp(models.Model):
         json_prop_data = {}
         json_prop_data['name'] = self.value_type.short_name
         json_prop_data['data'] = {
-                            'litsource': self.literature_source.human_name,
+                            'litsource': self.literature_source.name,
                             'value': self.prop_float_value,
                             'score': self.get_score()  
                             }      
@@ -150,7 +150,7 @@ class HazardCategoryProp(models.Model):
         string = f"self.value_type.category{self.prop_category_value}_item"       
         
         json_prop_data['data'] = {
-                            'litsource': self.literature_source.human_name,
+                            'litsource': self.literature_source.name,
                             'value': eval(string),
                             'score': self.get_score()  
                             }           
