@@ -6,9 +6,8 @@ class AbstractHazardPropType(models.Model):
     """
     Тип свойства это такие вещи как ПДК, мутагенность и т.д.
     индивидуальны для каждого компонента
-    """
-    
-   # importance = models.PositiveSmallIntegerField(blank=False, verbose_name='Важность', unique=True)
+    """   
+  
     name = models.CharField(max_length=400, blank=False, verbose_name="Название")
     short_name = models.CharField(max_length=100, blank=False, default="", verbose_name="Короткое название")
 
@@ -32,6 +31,55 @@ class HazardCategoryType(AbstractHazardPropType):
     class Meta:
         verbose_name = "Категория классификации"
         verbose_name_plural = "Категории классификации"
+
+
+class HazardCategoryProp(models.Model):
+
+    waste_component = models.ForeignKey('chemcomponent.WasteComponent', on_delete=models.CASCADE, related_name='category_props')   
+
+    value_type = models.ForeignKey(HazardCategoryType, on_delete=models.CASCADE, related_name='category_props')
+    prop_category_value = models.PositiveSmallIntegerField(blank=False, 
+                                                            validators=[MaxValueValidator(4),MinValueValidator(1)],
+                                                            null=False,                                                       
+                                                            verbose_name='Класс опасности')
+    literature_source = models.ForeignKey('litsource.LiteratureSource', 
+                                          on_delete=models.CASCADE, 
+                                          related_name='category_props',
+                                          verbose_name='Литература')
+
+    def __str__(self):
+        return \
+        f'{self.value_type} - возможные значения 1 - {self.value_type.category1_item}, 2 - {self.value_type.category2_item},\
+         3 - {self.value_type.category3_item}, 4 - {self.value_type.category4_item}'
+    
+    def get_json(self):
+        json_prop_data = {}
+        json_prop_data['name'] = self.value_type.short_name        
+        string = f"self.value_type.category{self.prop_category_value}_item"       
+        
+        json_prop_data['data'] = {
+                            'litsource': self.literature_source.name,
+                            'value': eval(string),
+                            'score': self.get_score()  
+                            }           
+
+        return json_prop_data
+
+    def get_score_str(self):
+
+        return self.value_type.get_score(self.prop_category_value)
+
+
+    def get_score(self):
+
+        return self.prop_category_value
+
+    class Meta:
+
+        unique_together = ['waste_component', 'value_type']
+        verbose_name = "Свойство классификации"
+        verbose_name_plural = "Свойства классификации"
+
 
 
 class HazardValueType(AbstractHazardPropType):    
@@ -85,7 +133,7 @@ class HazardValueProp(models.Model):
     value_type = models.ForeignKey(HazardValueType, on_delete=models.CASCADE, related_name='value_props')
     prop_float_value = models.FloatField(blank=False, 
                                          null=False,
-                                         validators=[MinValueValidator(0.),],
+                                        # validators=[MinValueValidator(0.),],
                                          verbose_name='Числовое значение')
     literature_source = models.ForeignKey('litsource.LiteratureSource', 
                                           on_delete=models.CASCADE, 
@@ -122,55 +170,25 @@ class HazardValueProp(models.Model):
   
 
 
-
-
-
-class HazardCategoryProp(models.Model):
-
-    waste_component = models.ForeignKey('chemcomponent.WasteComponent', on_delete=models.CASCADE, related_name='category_props')   
-
-    value_type = models.ForeignKey(HazardCategoryType, on_delete=models.CASCADE, related_name='category_props')
-    prop_category_value = models.PositiveSmallIntegerField(blank=False, 
-                                                            validators=[MaxValueValidator(4),MinValueValidator(1)],
-                                                            null=False,                                                       
-                                                            verbose_name='Класс опасности')
+class ValueProp(models.Model):
+    """
+    Props для составных свойств
+    Lg (S, мг/л / ПДКв, мг.л) 
+    """
+    waste_component = models.ForeignKey('chemcomponent.WasteComponent', on_delete=models.CASCADE, related_name='value_complex_props')
+    value_type = models.ForeignKey(HazardValueType, on_delete=models.CASCADE, related_name='value_complex_props')
+    prop_float_value = models.FloatField(blank=False, 
+                                         null=False,
+                                         validators=[MinValueValidator(0.),],
+                                         verbose_name='Числовое значение')
     literature_source = models.ForeignKey('litsource.LiteratureSource', 
                                           on_delete=models.CASCADE, 
-                                          related_name='category_props',
+                                          related_name='value_complex_props', 
                                           verbose_name='Литература')
-
-    def __str__(self):
-        return \
-        f'{self.value_type} - возможные значения 1 - {self.value_type.category1_item}, 2 - {self.value_type.category2_item},\
-         3 - {self.value_type.category3_item}, 4 - {self.value_type.category4_item}'
-    
-    def get_json(self):
-        json_prop_data = {}
-        json_prop_data['name'] = self.value_type.short_name        
-        string = f"self.value_type.category{self.prop_category_value}_item"       
-        
-        json_prop_data['data'] = {
-                            'litsource': self.literature_source.name,
-                            'value': eval(string),
-                            'score': self.get_score()  
-                            }           
-
-        return json_prop_data
-
-    def get_score_str(self):
-
-        return self.value_type.get_score(self.prop_category_value)
-
-
-    def get_score(self):
-
-        return self.prop_category_value
 
     class Meta:
 
         unique_together = ['waste_component', 'value_type']
-        verbose_name = "Свойство классификации"
-        verbose_name_plural = "Свойства классификации"
+        verbose_name = "Числовое свойство для комплексных вычислений типа Lg (S, мг/л / ПДКв, мг.л)"
+        verbose_name_plural = "Числовые свойства для комплексных вычислений типа Lg (S, мг/л / ПДКв, мг.л)"                                    
 
-
-   

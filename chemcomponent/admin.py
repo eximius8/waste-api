@@ -1,11 +1,16 @@
 from django.contrib import admin
+from django.db import models
+from django.forms import TextInput
 
 from chemcomponent.models import WasteComponent
-from componentprop.models import HazardValueProp, HazardCategoryProp
+from componentprop.models import HazardValueProp, HazardCategoryProp#, HazardComplexValueProp
 
 
 class ValuePropInline(admin.TabularInline):
     model = HazardValueProp
+
+#class ComplexValuePropInline(admin.TabularInline):
+ #   model = HazardComplexValueProp
 
 class CategoryPropInline(admin.TabularInline):
     model = HazardCategoryProp
@@ -14,8 +19,12 @@ class CategoryPropInline(admin.TabularInline):
 class WasteComponentAdmin(admin.ModelAdmin):
     list_display = ('name', 'chemical_type', 'X', 'Z', 'log_W', 'W', 'number_of_props')#, 'Binf')
     search_fields = ['name', 'other_names', 'cas_number']
+    formfield_overrides = {
+        models.CharField: {'widget': TextInput(attrs={'size':'200'})},        
+    }
     inlines = [
         ValuePropInline,
+       # ComplexValuePropInline,
         CategoryPropInline,
     ]
 

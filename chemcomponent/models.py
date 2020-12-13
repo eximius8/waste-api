@@ -11,7 +11,7 @@ class WasteComponent(models.Model):
     Класс для компонентов отхода
     """    
     name = models.CharField(max_length=400, blank=False, verbose_name="Название")
-    other_names = models.CharField(max_length=1000, blank=True, default="", verbose_name="Другие названия (через запятую)")
+    other_names = models.CharField(max_length=1000, blank=True, default="", verbose_name="Другие названия (через точку с запятой)")
     cas_number = models.CharField(max_length=30,
                                   verbose_name="Регистрационный номер CAS",
                                   blank=True,
@@ -34,14 +34,14 @@ class WasteComponent(models.Model):
                                 validators=[MinValueValidator(1.0),MaxValueValidator(4.0)])
     land_concentration = models.FloatField(blank=True, 
                                 null=True, 
-                                verbose_name="Максимальная фоновая концентрация в почвах (мг/кг)",
+                                verbose_name="Максимальная фоновая концентрация в почвах (мг/кг) (если известно - указание источника обязательно)",
                                 validators=[MaxValueValidator(1e6)])
     lit_source = models.ForeignKey('litsource.LiteratureSource',
                                     blank=True, 
                                     null=True, 
                                     on_delete=models.SET_NULL, 
                                     related_name='waste_components', 
-                                    verbose_name='Источник литературы (если задано числовое значение X, то обязателен)')
+                                    verbose_name='Источник литературы (если задано числовое значение X или фоновая концентрация, то обязателен)')
     
     
 
@@ -104,7 +104,22 @@ class WasteComponent(models.Model):
         """           
 
         return 10.**self.get_log_w()
-
+    
+  
+    def get_k(self, conc):
+        """
+        Показатель опасности компонента отхода 
+        conc - концентрация в мг/кг
+        если для компонента задана фоновая концентрация в почве и значение conc меньше нее
+        принимает W=1e6
+        в противном случае считает W согласно методике по свойства
+        """
+        if self.land_concentration:
+            if conc > self.land_concentration:
+                return conc / self.get_w()
+            return conc/1e6
+        return conc / self.get_w()
+    
     def get_props(self):
         """
         returns array of all props in {'prop': value} format
@@ -123,24 +138,6 @@ class WasteComponent(models.Model):
             props[data['name']]=data["data"]
 
         return props
-
-    
-  
-    def get_k(self, conc):
-        """
-        Показатель опасности компонента отхода 
-        conc - концентрация в мг/кг
-        если для компонента задана фоновая концентрация в почве и значение conc меньше нее
-        принимает W=1e6
-        в противном случае считает W согласно методике по свойства
-        """
-        if self.land_concentration:
-            if conc > self.land_concentration:
-                return (conc - self.land_concentration) / self.get_w()
-            return conc/1e6
-        return conc / self.get_w()
-    
-    
     
     def Binf(self):
         """
@@ -181,12 +178,9 @@ class WasteComponent(models.Model):
         if self.x_value and self.land_concentration:
             raise ValidationError(f'Нельзя указать X и фоновую концентрацию одновременно')
 
-
-
     
     class Meta:
         verbose_name = "Компонент отхода"
         verbose_name_plural = "Компоненты отхода"
-
 
 
