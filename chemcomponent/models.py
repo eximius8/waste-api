@@ -167,6 +167,21 @@ class WasteComponent(models.Model):
                                     on_delete=models.SET_NULL, 
                                     related_name='k_ow', 
                                     verbose_name='Источник литературы для K_ow (если задан, то обязателен)')
+    pdk_v_obj = ""
+
+    def get_B_pdk_v(self):  
+
+        if not self.pdk_v:
+            return 0
+        if self.pdk_v > 1:
+            return 4
+        elif 0.1 < self.pdk_v <= 1 :
+            return 3
+        elif 0.01 <= self.pdk_v <= 0.1:
+            return 2
+        return 1          
+            
+
 
 
     def get_x(self):
@@ -176,26 +191,20 @@ class WasteComponent(models.Model):
         if self.x_value:
             return self.x_value 
 
-        BigX = 0
-        num_props = 0     
+        BigX = self.get_B_pdk_v()
+          
        
         for value_prop in self.value_props.all():           
             BigX += value_prop.get_score()
-            num_props += 1
+            
                 
         for category_prop in self.category_props.all():
             BigX += category_prop.get_score()
-            num_props += 1
+            
             
 
-        if num_props < 6:
-            Binf = 1
-        elif 6 <= num_props <= 8:
-            Binf = 2
-        elif 8 < num_props <= 10:
-            Binf = 3
-        else:
-            Binf = 4
+        Binf = self.Binf()[0]
+        num_props = self.Binf()[1]
                     
         return (BigX + Binf) / (num_props + 1)
     
@@ -269,9 +278,18 @@ class WasteComponent(models.Model):
         """
 
         cat_props_num = self.category_props.count()
-        val_props_num = self.value_props.count()
-        
+        val_props_num = self.value_props.count()        
         num_props = cat_props_num + val_props_num
+
+        props_1_num = ['pdk_v', 'pdk_ss', 'pdk_mr', 'k_ow']
+        for prop in props_1_num:
+            if bool(eval(f'self.{prop}')):
+                num_props += 1
+        pair_props = [ ['bpk5', 'xpk',], ['s_rastv', 'pdk_v',], ['c_nasish', 'pdk_rz'], ['c_nasish', 'pdk_ss'], ['c_nasish', 'pdk_mr']]
+        
+        for pair in pair_props:
+            if bool(eval(f'self.{pair[0]}')) and bool(eval(f'self.{pair[1]}')):
+                num_props += 1
 
         if num_props < 6:
             Binf = 1
@@ -282,7 +300,7 @@ class WasteComponent(models.Model):
         else:
             Binf = 4
         
-        return Binf
+        return [Binf, num_props]
 
 
     def __str__(self):
