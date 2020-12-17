@@ -100,6 +100,10 @@ lc_50_water = HazardValueType.objects.create(
     name="Средняя смертельная концентрация вещества в воде, вызывающая гибель 50% всех взятых в опыт гидробионтов (например, рыб) через 96 часов",
                                             short_name="LC50 водн, мг/л/96 ч",bad_val=1, average_val=5, good_val=100) 
 
+lg_k_ow = HazardValueType.objects.create(
+    name="Логарифм коэффициента распределения в системе октанол/вода при 20°С",
+                                            short_name="lg(Kow)",bad_val=4, average_val=2, good_val=0) 
+
 with open('mpr536.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0

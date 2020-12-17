@@ -156,19 +156,6 @@ class WasteComponent(models.Model):
                                     verbose_name='Источник литературы для ХПК (если задан, то обязателен)')
 
 
-    k_ow = models.FloatField(blank=True, 
-                                null=True, 
-                verbose_name="Коэффициент распределения в системе октанол/вода при 20°С",
-                                validators=[MinValueValidator(0)])
-    
-    k_ow_lit_source = models.ForeignKey('litsource.LiteratureSource',
-                                    blank=True, 
-                                    null=True, 
-                                    on_delete=models.SET_NULL, 
-                                    related_name='k_ow', 
-                                    verbose_name='Источник литературы для K_ow (если задан, то обязателен)')
-    pdk_v_obj = ""
-
     def get_B_pdk_v(self):  
 
         if not self.pdk_v:
@@ -179,7 +166,9 @@ class WasteComponent(models.Model):
             return 3
         elif 0.01 <= self.pdk_v <= 0.1:
             return 2
-        return 1          
+        return 1
+
+   
             
 
 
@@ -281,7 +270,7 @@ class WasteComponent(models.Model):
         val_props_num = self.value_props.count()        
         num_props = cat_props_num + val_props_num
 
-        props_1_num = ['pdk_v', 'pdk_ss', 'pdk_mr', 'k_ow']
+        props_1_num = ['pdk_v', 'pdk_ss', 'pdk_mr', ]
         for prop in props_1_num:
             if bool(eval(f'self.{prop}')):
                 num_props += 1
@@ -308,7 +297,7 @@ class WasteComponent(models.Model):
     
     def clean(self):
 
-        props = ['x_value', 'land_concentration', 's_rastv', 'pdk_v', 'c_nasish', 'pdk_rz', 'pdk_ss', 'pdk_mr', 'bpk5', 'xpk', 'k_ow']
+        props = ['x_value', 'land_concentration', 's_rastv', 'pdk_v', 'c_nasish', 'pdk_rz', 'pdk_ss', 'pdk_mr', 'bpk5', 'xpk']
 
         for prop_str in props:
             prop = bool(eval(f'self.{prop_str}'))
