@@ -18,13 +18,14 @@ soil_safety_class = HazardCategoryType.objects.create(name="Класс опас�
                                                       category3_item="3",
                                                       category4_item="Не установлен")
 
+""" 
 drink_water_safety_class = HazardCategoryType.objects.create(
     name="Класс опасности в воде водных объектов, используемых для целей питьевого и хозяйственно-бытового водоснабжения",
                                                       short_name="Класс опасности в питьевой воде",
                                                       category1_item="1",
                                                       category2_item="2",
                                                       category3_item="3",
-                                                      category4_item="4")
+                                                      category4_item="4") """
 
 
 fish_water_safety_class = HazardCategoryType.objects.create(
@@ -104,10 +105,10 @@ with open('mpr536.csv') as csv_file:
         if row[2]:
             WasteComponent.objects.create(name=row[0],
                                           x_value=float(row[1]),
-                                          lit_source=prikaz,
+                                          x_value_lit_source=prikaz,
                                           cas_number=row[2])
         else:
             WasteComponent.objects.create(name=row[0],
-                                          lit_source=prikaz,
+                                          x_value_lit_source=prikaz,
                                           x_value=float(row[1]))                                          
     

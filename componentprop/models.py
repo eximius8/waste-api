@@ -168,27 +168,3 @@ class HazardValueProp(models.Model):
         verbose_name = "Числовое свойство"
         verbose_name_plural = "Числовые свойства"    
   
-
-
-class ValueProp(models.Model):
-    """
-    Props для составных свойств
-    Lg (S, мг/л / ПДКв, мг.л) 
-    """
-    waste_component = models.ForeignKey('chemcomponent.WasteComponent', on_delete=models.CASCADE, related_name='value_complex_props')
-    value_type = models.ForeignKey(HazardValueType, on_delete=models.CASCADE, related_name='value_complex_props')
-    prop_float_value = models.FloatField(blank=False, 
-                                         null=False,
-                                         validators=[MinValueValidator(0.),],
-                                         verbose_name='Числовое значение')
-    literature_source = models.ForeignKey('litsource.LiteratureSource', 
-                                          on_delete=models.CASCADE, 
-                                          related_name='value_complex_props', 
-                                          verbose_name='Литература')
-
-    class Meta:
-
-        unique_together = ['waste_component', 'value_type']
-        verbose_name = "Числовое свойство для комплексных вычислений типа Lg (S, мг/л / ПДКв, мг.л)"
-        verbose_name_plural = "Числовые свойства для комплексных вычислений типа Lg (S, мг/л / ПДКв, мг.л)"                                    
-

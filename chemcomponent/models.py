@@ -28,22 +28,146 @@ class WasteComponent(models.Model):
                                      default = 'O', 
                                      choices=CHOICES, 
                                      verbose_name="Тип")
+
     x_value = models.FloatField(blank=True, 
                                 null=True, 
         verbose_name="X - относительный параметр опасности компонента отхода для окружающей среды (если известен - указание источника обязательно)",
                                 validators=[MinValueValidator(1.0),MaxValueValidator(4.0)])
-    land_concentration = models.FloatField(blank=True, 
-                                null=True, 
-                                verbose_name="Максимальная фоновая концентрация в почвах (мг/кг) (если известно - указание источника обязательно)",
-                                validators=[MaxValueValidator(1e6)])
-    lit_source = models.ForeignKey('litsource.LiteratureSource',
+    x_value_lit_source = models.ForeignKey('litsource.LiteratureSource',
                                     blank=True, 
                                     null=True, 
                                     on_delete=models.SET_NULL, 
-                                    related_name='waste_components', 
-                                    verbose_name='Источник литературы (если задано числовое значение X или фоновая концентрация, то обязателен)')
+                                    related_name='x_value', 
+                                    verbose_name='Источник литературы для относительного параметра опаности (если задано числовое значение X, то обязателен)')
+                               
+
+    land_concentration = models.FloatField(blank=True, 
+                                null=True, 
+                                verbose_name="Максимальная фоновая концентрация в почвах (мг/кг) (если известно - указание источника обязательно)",
+                                validators=[MinValueValidator(0), MaxValueValidator(1e6)])
     
+    land_concentration_lit_source = models.ForeignKey('litsource.LiteratureSource',
+                                    blank=True, 
+                                    null=True, 
+                                    on_delete=models.SET_NULL, 
+                                    related_name='land_concentration', 
+                                    verbose_name='Источник литературы для фоновой концентрации (если задана фоновая концентрация, то обязателен)')
+   
     
+    s_rastv = models.FloatField(blank=True, 
+                                null=True, 
+                                verbose_name="Растворимость компонента отхода (вещества) в воде при 20°С (мг/л)",
+                                validators=[MinValueValidator(0)])
+    
+    s_rastv_lit_source = models.ForeignKey('litsource.LiteratureSource',
+                                    blank=True, 
+                                    null=True, 
+                                    on_delete=models.SET_NULL, 
+                                    related_name='s_rastv', 
+                                    verbose_name='Источник литературы для растворимости компонента отхода (если задана, то обязателен)')
+
+    pdk_v = models.FloatField(blank=True, 
+                                null=True, 
+    verbose_name="Предельно допустимая концентрация вещества в воде водных объектов, используемых для целей питьевого и хозяйственно-бытового водоснабжения (мг/л)",
+                                validators=[MinValueValidator(0)])
+    
+    pdk_v_lit_source = models.ForeignKey('litsource.LiteratureSource',
+                                    blank=True, 
+                                    null=True, 
+                                    on_delete=models.SET_NULL, 
+                                    related_name='pdk_v', 
+                                    verbose_name='Источник литературы для ПДКв (если задан, то обязателен)')
+
+   
+    c_nasish = models.FloatField(blank=True, 
+                                null=True, 
+                                verbose_name="Насыщающая концентрация вещества в воздухе при 20°С и нормальном давлении (мг/м^3)",
+                                validators=[MinValueValidator(0)])
+    
+    c_nasish_lit_source = models.ForeignKey('litsource.LiteratureSource',
+                                    blank=True, 
+                                    null=True, 
+                                    on_delete=models.SET_NULL, 
+                                    related_name='c_nasish', 
+                                    verbose_name='Источник литературы для насыщающей концентрации вещества (если задана, то обязателен)')
+
+   
+    pdk_rz = models.FloatField(blank=True, 
+                                null=True, 
+                verbose_name="Предельно допустимая концентрация вещества в атмосферном воздухе рабочей зоны (мг/м^3)",
+                                validators=[MinValueValidator(0)])
+    
+    pdk_rz_lit_source = models.ForeignKey('litsource.LiteratureSource',
+                                    blank=True, 
+                                    null=True, 
+                                    on_delete=models.SET_NULL, 
+                                    related_name='pdk_rz', 
+                                    verbose_name='Источник литературы для ПДКрз (если задан, то обязателен)')
+
+
+    pdk_ss = models.FloatField(blank=True, 
+                                null=True, 
+                verbose_name="Предельно допустимая концентрация вещества среднесуточная в атмосферном воздухе населенных мест (мг/м^3)",
+                                validators=[MinValueValidator(0)])
+    
+    pdk_ss_lit_source = models.ForeignKey('litsource.LiteratureSource',
+                                    blank=True, 
+                                    null=True, 
+                                    on_delete=models.SET_NULL, 
+                                    related_name='pdk_ss', 
+                                    verbose_name='Источник литературы для ПДКсс (если задан, то обязателен)')
+
+
+    pdk_mr = models.FloatField(blank=True, 
+                                null=True, 
+                verbose_name="Предельно допустимая концентрация вещества максимально разовая в атмосферном воздухе населенных мест (мг/м^3)",
+                                validators=[MinValueValidator(0)])
+    
+    pdk_mr_lit_source = models.ForeignKey('litsource.LiteratureSource',
+                                    blank=True, 
+                                    null=True, 
+                                    on_delete=models.SET_NULL, 
+                                    related_name='pdk_mr', 
+                                    verbose_name='Источник литературы для ПДКмр (если задан, то обязателен)')
+    
+    bpk5 = models.FloatField(blank=True, 
+                            null=True, 
+                verbose_name="Биологическое потребление кислорода, выраженное в миллилитрах O2/л за 5 суток",
+                            validators=[MinValueValidator(0)])
+    
+    bpk5_lit_source = models.ForeignKey('litsource.LiteratureSource',
+                                    blank=True, 
+                                    null=True, 
+                                    on_delete=models.SET_NULL, 
+                                    related_name='bpk5', 
+                                    verbose_name='Источник литературы для БПК5 (если задан, то обязателен)')
+
+
+    xpk = models.FloatField(blank=True, 
+                                null=True, 
+                verbose_name="Химическое потребление кислорода ХПК, выраженное в миллилитрах O2/100 л",
+                                validators=[MinValueValidator(0)])
+    
+    xpk_lit_source = models.ForeignKey('litsource.LiteratureSource',
+                                    blank=True, 
+                                    null=True, 
+                                    on_delete=models.SET_NULL, 
+                                    related_name='xpk', 
+                                    verbose_name='Источник литературы для ХПК (если задан, то обязателен)')
+
+
+    k_ow = models.FloatField(blank=True, 
+                                null=True, 
+                verbose_name="Коэффициент распределения в системе октанол/вода при 20°С",
+                                validators=[MinValueValidator(0)])
+    
+    k_ow_lit_source = models.ForeignKey('litsource.LiteratureSource',
+                                    blank=True, 
+                                    null=True, 
+                                    on_delete=models.SET_NULL, 
+                                    related_name='k_ow', 
+                                    verbose_name='Источник литературы для K_ow (если задан, то обязателен)')
+
 
     def get_x(self):
         """
@@ -166,18 +290,18 @@ class WasteComponent(models.Model):
     
     def clean(self):
 
-        if self.x_value and not self.lit_source:
-            raise ValidationError(f'При задании коэффициента W, необходимо указать источник литературы, откуда он взят')
+        props = ['x_value', 'land_concentration', 's_rastv', 'pdk_v', 'c_nasish', 'pdk_rz', 'pdk_ss', 'pdk_mr', 'bpk5', 'xpk', 'k_ow']
 
-        if self.land_concentration and not self.lit_source:
-            raise ValidationError(f'При задании фоновой концентрации в почве, необходимо указать источник литературы')
+        for prop_str in props:
+            prop = bool(eval(f'self.{prop_str}'))
+            prop_source = bool(eval(f'self.{prop_str}_lit_source'))
+            if prop and not prop_source:
+                raise ValidationError(f'При задании свойства {prop_str} необходимо задать источник')
+            if not prop and prop_source:
+                raise ValidationError(f'Для свойства {prop_str} задан источник, но не задано значение')
 
-        if self.lit_source and not (self.x_value or self.land_concentration):
-            raise ValidationError(f'При задании источника литературы, необходимо указать X или фоновую концентрацию')
 
-        if self.x_value and self.land_concentration:
-            raise ValidationError(f'Нельзя указать X и фоновую концентрацию одновременно')
-
+        
     
     class Meta:
         verbose_name = "Компонент отхода"
