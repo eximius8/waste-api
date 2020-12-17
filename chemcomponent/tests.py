@@ -13,6 +13,7 @@ class WasteComponentTests(TestCase):
 
         self.for_models()
         self.for_api()
+        self.create_comp_with_lg_prop()
 
     def test_simple(self):
 
@@ -94,6 +95,9 @@ class WasteComponentTests(TestCase):
         self.pdk_r_h = HazardValueType.objects.create(bad_val=.001,
                                                      average_val=.01,
                                                      good_val=0.1)
+        self.lg_kow = HazardValueType.objects.create(bad_val=4,
+                                                     average_val=2,
+                                                     good_val=0)
       
         self.gost_src = LiteratureSource.objects.create(name="Gost", latexpart="Bred")
 
@@ -179,6 +183,26 @@ class WasteComponentTests(TestCase):
         self.assertAlmostEqual(self.mastika.get_k(18200), 457.2, places=1)
         self.assertAlmostEqual(self.mastika.get_w(), 39.81, places=2)
 
+    
+    def create_comp_with_lg_prop(self):
+
+        self.orgnic_shit = WasteComponent.objects.create(name="Органика")
+        self.orgnic_shit_lg_kow = HazardValueProp.objects.create(waste_component=self.orgnic_shit,
+                                                                value_type=self.lg_kow,
+                                                                prop_float_value=5,
+                                                                literature_source=self.gost_src)
+
+        self.assertEqual(self.orgnic_shit.get_x(), 1)
+        self.assertEqual(self.orgnic_shit.Binf()[1], 1)
+
+        self.orgnic_shit2 = WasteComponent.objects.create(name="Органика")
+        self.orgnic_shit2_lg_kow = HazardValueProp.objects.create(waste_component=self.orgnic_shit2,
+                                                                value_type=self.lg_kow,
+                                                                prop_float_value=3,
+                                                                literature_source=self.gost_src)
+
+        self.assertEqual(self.orgnic_shit2.get_x(), 1.5)
+       
     
 
         

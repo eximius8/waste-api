@@ -36,8 +36,7 @@ class WasteComponentAdmin(admin.ModelAdmin):
         
         ('pdk_rz_lit_source', 'pdk_rz'),
         ('s_rastv_lit_source', 's_rastv'),
-        ('c_nasish_lit_source', 'c_nasish'),
-        ('k_ow_lit_source','k_ow'),
+        ('c_nasish_lit_source', 'c_nasish'),       
         
         ('bpk5_lit_source', 'bpk5'),
         ('xpk_lit_source', 'xpk'),

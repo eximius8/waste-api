@@ -156,7 +156,7 @@ class WasteComponent(models.Model):
                                     verbose_name='Источник литературы для ХПК (если задан, то обязателен)')
 
 
-    def get_B_pdk_v(self):  
+    def get_pdk_v_score(self):  
 
         if not self.pdk_v:
             return 0
@@ -168,8 +168,20 @@ class WasteComponent(models.Model):
             return 2
         return 1
 
-   
-            
+    def get_BD_score(self):
+        if not self.bpk5 or not self.xpk:
+            return [False, 0]
+        bd = self.bpk5 / self.xpk *100
+        
+        if bd > 10:
+            return [bd, 4]
+        elif 1 < bd <= 10:
+            return [bd, 3]
+        elif 0.1 <= bd <= 1:
+            return [bd, 2]
+        return [bd, 1]
+    
+   # def get_lg_
 
 
 
@@ -180,7 +192,7 @@ class WasteComponent(models.Model):
         if self.x_value:
             return self.x_value 
 
-        BigX = self.get_B_pdk_v()
+        BigX = self.get_pdk_v_score() + self.get_BD_score()[1]
           
        
         for value_prop in self.value_props.all():           
