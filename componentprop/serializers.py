@@ -20,19 +20,26 @@ class AbstractPropSerializer(serializers.ModelSerializer):
 
 
 class CategoryPropSerializer(AbstractPropSerializer):
-
+   
+    score = serializers.IntegerField(source='get_score')
+    value = serializers.CharField(source='get_score_str')
+    name = serializers.CharField(source='value_type')
     
     
     class Meta:
 
         model = HazardCategoryProp        
-        fields = ('value_type', 'get_score_str', 'get_score' )
+        fields = ('name', 'value', 'score' )
 
 
 
 class ValuePropSerializer(AbstractPropSerializer):
+
+    score = serializers.IntegerField(source='get_score')
+    value = serializers.CharField(source='prop_float_value')
+    name = serializers.CharField(source='value_type')
     
     class Meta:
 
         model = HazardValueProp       
-        fields = ('value_type', 'prop_float_value', 'get_score')
+        fields = ('name', 'value', 'score')

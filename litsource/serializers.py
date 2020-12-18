@@ -6,6 +6,5 @@ class LitSourceSerializer(serializers.ModelSerializer):
 
     class Meta:
 
-        model = LiteratureSource
-        read_only_fields = ('human_name', 'source_url')
-        fields =  ('human_name', 'source_url')
+        model = LiteratureSource        
+        fields =  ('id', 'name', 'source_type', 'latexpart', 'human_name', 'source_url', )

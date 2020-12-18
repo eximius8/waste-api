@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from .serializers import WasteSerializer
 from .models import WasteClass, ConcentrationClass
 from chemcomponent.models import WasteComponent
+from chemcomponent.serializers import WasteComponentSerializer
 
 
 
@@ -15,29 +16,28 @@ def calculate_safety_klass_view(request):
     data = []
     if data_in_serializer.is_valid():
         fake_objs = []
+       
         ghost_waste = WasteClass(name=data_in_serializer.validated_data['name'], 
-        fkko=data_in_serializer.validated_data['fkko'])        
-        for conc in request.data['components']:           
+        fkko=data_in_serializer.validated_data['fkko'])
+        for conc in request.data['components']:
+            waste_comp = WasteComponent.objects.get(pk=conc['id_val'])
             fake_objs += [ConcentrationClass(waste = ghost_waste,
                                             conc_value = float(conc['concentration'])*1e4,
-                                            component = WasteComponent.objects.get(pk=conc['id_val'])),]                                   
+                                            component = waste_comp),]
+                          
             
         # ghost_waste.generate_report(fake_objs, 'test_gcloud_upload')
        
         for concentration in fake_objs:            
-            data += [{ "name": concentration.component.name,
+            data += [{ 
                         "concp": float(concentration.conc_value * 1e-4), #"%.2f" % 
                         "concr": concentration.conc_value, 
-                        "xi": concentration.component.get_x(), 
-                        "zi": concentration.component.get_z(), 
-                        "lgw": concentration.component.get_log_w(), 
-                        "w": concentration.component.get_w(), 
-                        "k": concentration.get_K(),
-                        "props": concentration.component.get_props(),
-                        "has_x": bool(concentration.component.x_value),
-                        "has_soil_c": bool(concentration.component.land_concentration),
+                        "k": concentration.component.get_k(concentration.conc_value),
+                        "component": WasteComponentSerializer(concentration.component).data,  
                     }]
         return Response({
+            "name": ghost_waste.name,
+            "fkko": ghost_waste.fkko,
             "total_k": ghost_waste.get_summ_K(fake_objs=fake_objs),
             "safety_class": ghost_waste.get_safety_class(fake_objs=fake_objs),
             "components": data,
@@ -57,9 +57,9 @@ def calculate_safety_klass_view(request):
     "name": "dsa",
     "fkko": "Хрю хрю",
     "components": [
-        {"id_val": 1, "concentrat": 50 },
-        {"id_val": 2, "concentrat": 30 },
-        {"id_val": 3, "concentrat": 20 }
+        {"id_val": 1, "concentration": 50 },
+        {"id_val": 2, "concentration": 30 },
+        {"id_val": 3, "concentration": 20 }
         ]
 }   
      """
