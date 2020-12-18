@@ -156,21 +156,39 @@ class WasteComponent(models.Model):
                                     verbose_name='Источник литературы для ХПК (если задан, то обязателен)')
 
 
-    def get_pdk_v_score(self):  
+    def get_prop_score(self, value, limits):
 
-        if not self.pdk_v:
+        if not value:
             return 0
-        if self.pdk_v > 1:
+        if value > limits[2]:
             return 4
-        elif 0.1 < self.pdk_v <= 1 :
+        elif limits[1] < value <= limits[2]:
             return 3
-        elif 0.01 <= self.pdk_v <= 0.1:
+        elif limits[0] <= value <= limits[1]:
             return 2
         return 1
 
+
+    def get_pdk_v_score(self):
+
+        return self.get_prop_score(value=self.pdk_v, limits=[0.01,0.1,1])
+
+        
+    
+    def get_pdk_ss_score(self):
+
+        return self.get_prop_score(value=self.pdk_ss, limits=[0.01,0.1,1])
+        
+    
+    def get_pdk_mr_score(self):
+
+        return self.get_prop_score(value=self.pdk_mr, limits=[0.01,0.1,1])
+        
+
     def get_BD_score(self):
+
         if not self.bpk5 or not self.xpk:
-            return [False, 0]
+            return (False, 0)
         bd = self.bpk5 / self.xpk *100
         
         if bd > 10:
@@ -181,7 +199,39 @@ class WasteComponent(models.Model):
             return [bd, 2]
         return [bd, 1]
     
-   # def get_lg_
+    def get_lg_score(self, props, limits):
+        
+        if not all(props):
+            return (False, 0)
+
+        chislit = props[0]
+        znamenat = props[1]
+        
+        value = math.log10(chislit/znamenat)
+
+        if value < limits[2]:
+            return (value, 4)
+        elif limits[1] > value >= limits[2]:
+            return (value, 3)
+        elif limits[0] >= value >= limits[1]:
+            return (value, 2)
+        return (value, 1)
+    
+    def get_s_rastv_pdk_v_score(self):
+
+        return self.get_lg_score(props=(self.s_rastv, self.pdk_v), limits=[5,2,1])
+
+    def get_c_nasish_pdk_rz_score(self):
+
+        return self.get_lg_score(props=(self.c_nasish, self.pdk_rz), limits=[5,2,1])
+    
+    def get_c_nasish_pdk_ss_score(self):
+
+        return self.get_lg_score(props=(self.c_nasish, self.pdk_ss), limits=[7,3.9,1.6])
+    
+    def get_c_nasish_pdk_mr_score(self):
+
+        return self.get_lg_score(props=(self.c_nasish, self.pdk_mr), limits=[7,3.9,1.6])
 
 
 
@@ -192,7 +242,14 @@ class WasteComponent(models.Model):
         if self.x_value:
             return self.x_value 
 
-        BigX = self.get_pdk_v_score() + self.get_BD_score()[1]
+        BigX = sum([self.get_pdk_v_score(),
+                    self.get_pdk_ss_score(),
+                    self.get_pdk_mr_score(),
+                    self.get_BD_score()[1],
+                    self.get_s_rastv_pdk_v_score()[1],
+                    self.get_c_nasish_pdk_rz_score()[1],
+                    self.get_c_nasish_pdk_ss_score()[1],
+                    self.get_c_nasish_pdk_mr_score()[1]])
           
        
         for value_prop in self.value_props.all():           
