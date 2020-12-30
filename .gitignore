@@ -90,3 +90,7 @@ local_settings.py
 
 .env
 *sqlite3
+
+
+bezoder.json
+app.yaml

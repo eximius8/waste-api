@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'wagtail.api.v2',
     'corsheaders',
-   # 'django_filters',
+    'django_filters',
 ]
 
 REST_FRAMEWORK = {
@@ -113,7 +113,7 @@ if os.getenv('GAE_APPLICATION', None):
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'HOST': '/cloudsql/bezoder:us-central1:bezoder-psql',
-            'NAME': 'waste_api',
+            'NAME': DB_NAME,
             'USER': POSTGR_WASTE_USER,
             'PASSWORD': POSTGR_WASTE_USER_PASS,            
         }
@@ -135,7 +135,7 @@ else:
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'HOST': '127.0.0.1',
             'PORT': '3306',
-            'NAME': 'waste_api',
+            'NAME': DB_NAME,
             'USER': POSTGR_WASTE_USER,
             'PASSWORD': POSTGR_WASTE_USER_PASS,
         }

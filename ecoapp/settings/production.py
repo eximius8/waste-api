@@ -26,7 +26,7 @@ ALLOWED_HOSTS = [
 
 # DRF CORS settings
 #CORS_ALLOW_ALL_ORIGINS = True
-# CORS_ALLOWED_ORIGINS 
+
 CORS_ALLOWED_ORIGINS = [
     "https://ma34.ru",
     "https://www.ma34.ru",    
